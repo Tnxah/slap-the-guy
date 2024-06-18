@@ -1,22 +1,17 @@
 using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 {
-    private AnimationController animationController;
-    private PlayerStats playerStats;
+    //NEW========
+    public AnimationController animationController;
+    public PlayerStats playerStats;
+    public PlayerCombat playerCombat;
+    public PlayerMovement playerMovement;
+    //NEW========
+
     private PlayerControls playerControls;
 
-    private SpriteRenderer spriteRenderer;
-
-    [SerializeField]
-    private GameObject throwablePrefab;
-
-    [SerializeField]
-    private Transform throwPoint;
 
     private void Awake()
     {
@@ -25,23 +20,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             playerControls = new PlayerControls();
 
             playerControls.Player.Rotate.performed += direction => photonView.RPC("Rotate", RpcTarget.All, direction.ReadValue<float>());
-            playerControls.Player.Attack.performed += _ => photonView.RPC("Attack", RpcTarget.All);
             playerControls.Player.Dodge.performed += ctx => photonView.RPC("Dodge", RpcTarget.All, true);
             playerControls.Player.Dodge.canceled += ctx => photonView.RPC("Dodge", RpcTarget.All, false);
-            playerControls.Player.Throw.performed += _ => photonView.RPC("Throw", RpcTarget.All); ;
             playerControls.Player.Fake.performed += _ => Fake();
         }
 
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         animationController = gameObject.GetComponent<AnimationController>();
         playerStats = gameObject.GetComponent<PlayerStats>();
-    }
-
-    [PunRPC]
-    private void Attack()
-    {
-        if(playerStats.TryUseStamina(20))
-        animationController.AttackAnimation();
+        playerCombat = gameObject.GetComponent<PlayerCombat>();
+        playerMovement = gameObject.GetComponent<PlayerMovement>();
     }
 
     [PunRPC]
@@ -56,19 +43,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             playerStats.StopStaminaBurn();
             animationController.DodgeToIdleAnimation();
         }
-    }
-
-    [PunRPC]
-    private void Throw()
-    {
-        if (playerStats.TryUseStamina(30))
-            animationController.ThrowAnimation();
-    }
-
-    private void ThrowItem()
-    {
-        var throwableItem = Instantiate(throwablePrefab, throwPoint.position, Quaternion.identity).GetComponent<Rigidbody2D>();
-        throwableItem.AddForce(new Vector2(-transform.localScale.x * 450, 0), ForceMode2D.Force);
     }
 
     [PunRPC]
