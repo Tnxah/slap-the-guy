@@ -25,4 +25,9 @@ public class AnimationController : MonoBehaviour
     {
         animator.SetBool("Dodge", false);
     }
+
+    public void ThrowAnimation()
+    {
+        animator.SetTrigger("Throw");
+    }
 }
