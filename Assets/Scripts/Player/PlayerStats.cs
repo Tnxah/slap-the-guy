@@ -5,38 +5,46 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
 {
-    private int health = 100;
-    private int stamina = 100;
+    private PlayerController controller;
 
-    private int staminaHeal = 5;
-    private int healthHeal = 1;
+    private float health = 100;
+    private float stamina = 100;
 
+    private const float CourutineTimeStep = 0.25f;
+
+    private const float healthHeal = 0.25f;
+    private const float staminaHeal = 4f;
+
+    private bool regenerateStamina;
     private bool staminaBurn;
 
     private StatsBar statsBar;
 
+    private void Awake()
+    {
+        controller = GetComponent<PlayerController>();
+    }
+
     private void Start()
     {
         statsBar = StatsBar.instance;
+
+        regenerateStamina = true;
         StartCoroutine(Regeneration());
     }
 
+    //===HEALTH===
     public void TakeDamage(int amount)
     {
         health -= amount;
+
+        controller.animationController.HurtAnimation();
 
         if(photonView.IsMine)
             statsBar.SetHealth(health);
 
         if (health <= 0)
             Die();
-    }
-    private void UseStamina(int amount)
-    {
-        stamina = Mathf.Clamp(stamina - amount, 0, 100);
-
-        if (photonView.IsMine)
-            statsBar.SetStamina(stamina);
     }
 
     private void Die()
@@ -47,66 +55,70 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
         }
     }
 
+    //===STAMINA===
+    public bool TryUseStamina(int amount)
+    {
+        if(stamina >= amount)
+        {
+            stamina = Mathf.Clamp(stamina - amount, 0, 100);
+
+            if (photonView.IsMine)
+                statsBar.SetStamina(stamina);
+            
+            return true;
+        } else 
+            return false;
+    }
+
+    //===REGENERATION===
     private IEnumerator Regeneration()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(CourutineTimeStep);
+            if (regenerateStamina)
+            {
+                stamina = Mathf.Clamp(stamina + staminaHeal, 0, 100);
+                if (photonView.IsMine)
+                    statsBar.SetStamina(stamina);
+            }
 
-            stamina = Mathf.Clamp(stamina + staminaHeal, 0, 100);
-            if (photonView.IsMine)
-                statsBar.SetStamina(stamina);
             health = Mathf.Clamp(health + healthHeal, 0, 100);
             if (photonView.IsMine)
                 statsBar.SetHealth(health);
         }
     }
 
-    public bool TryUseStamina(int amount)
-    {   if (stamina >= amount) 
-        {
-            UseStamina(amount);
-            return true;
-        } 
-        else
-        {
-            return false;
-        }
-        
-    }
 
-    public bool StartStaminaBurn(int amount, Action onStaminaEnd)
+    //===STAMINABURN===
+    public void StartStaminaBurn(float amount, Action onStaminaEnd)
     {
-        if (TryUseStamina(amount))
-        {
-            StartCoroutine(StaminaBurn(amount, onStaminaEnd));
-            return true;
-        } else 
-            return false;
+        staminaBurn = true;
+        regenerateStamina = false;
+        StartCoroutine(StaminaBurn(amount, onStaminaEnd));
     }
     public void StopStaminaBurn()
     {
         staminaBurn = false;
+        regenerateStamina = true;
     }
 
-    private IEnumerator StaminaBurn(int amount, Action onStaminaEnd)
+    private IEnumerator StaminaBurn(float amount, Action onStaminaEnd)
     {
-        staminaBurn = true;
-        while (staminaBurn && stamina > 0)
+        while (staminaBurn)
         {
+            yield return new WaitForSeconds(CourutineTimeStep);
+
             stamina = Mathf.Clamp(stamina - amount, 0, 100);
             if (photonView.IsMine)
                 statsBar.SetStamina(stamina);
 
-            yield return new WaitForSeconds(0.25f);
+            if (stamina <= 0)
+            {
+                onStaminaEnd?.Invoke();
+                onStaminaEnd = null;
+                StopStaminaBurn();
+            }
         }
-
-        if (stamina <= 0)
-        {
-            print("STAMINA END");
-            onStaminaEnd?.Invoke();
-            onStaminaEnd = null;
-        }
-        staminaBurn = false;
     }
 }

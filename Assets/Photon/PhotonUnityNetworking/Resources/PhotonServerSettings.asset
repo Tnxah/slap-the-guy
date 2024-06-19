@@ -47,6 +47,8 @@ MonoBehaviour:
   - Throw
   - PunRPC_Attack
   - PunRPC_Throw
+  - PunRPC_Rotate
+  - PunRPC_Dodge
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

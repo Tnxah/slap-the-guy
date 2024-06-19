@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimationController : MonoBehaviour
@@ -29,5 +27,10 @@ public class AnimationController : MonoBehaviour
     public void ThrowAnimation()
     {
         animator.SetTrigger("Throw");
+    }
+
+    public void HurtAnimation()
+    {
+        animator.SetTrigger("Hurt");
     }
 }

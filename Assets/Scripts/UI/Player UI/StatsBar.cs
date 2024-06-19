@@ -20,10 +20,10 @@ public class StatsBar : MonoBehaviour
 
     public void SetHealth(float amount)
     {
-        health.value = (float)amount / 100;
+        health.value = amount / 100;
     }
     public void SetStamina(float amount)
     {
-        stamina.value = (float)amount / 100;
+        stamina.value = amount / 100;
     }
 }

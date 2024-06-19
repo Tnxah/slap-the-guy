@@ -12,13 +12,14 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
     private PlayerControls playerControls;
 
     private const int AttackCost = 15;
-    private const int ThrowCost = 25;
+    private const int ThrowCost = 20;
 
     [SerializeField] //replace with Load from Recources
     private List<GameObject> throwablePrefabs = new List<GameObject>();
     
     [SerializeField]
     private Transform throwPoint;
+    private const float throwableSpeed = 450;
 
     //For dynamic throwables
     private Random random = new Random();
@@ -30,7 +31,7 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
         if (photonView.IsMine)
         {
-            playerControls = new PlayerControls();
+            playerControls = controller.playerControls;
 
             playerControls.Player.Attack.performed += _ => Attack();
             playerControls.Player.Throw.performed += _ => Throw();
@@ -67,27 +68,12 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
     private void InstantiateThrowable()
     {
-        var throwableItem = Instantiate(throwablePrefabs[nextThrowable], throwPoint.position, Quaternion.identity).GetComponent<Rigidbody2D>();
-        throwableItem.AddForce(new Vector2(-transform.localScale.x * 450, 0), ForceMode2D.Force);
-    }
+        var throwableItem = Instantiate(throwablePrefabs[nextThrowable], 
+            throwPoint.position, 
+            Quaternion.identity).GetComponent<Rigidbody2D>();
 
-    public override void OnEnable()
-    {
-        base.OnEnable();
+        var direction = controller.playerMovement.GetDirection();
 
-        if (photonView.IsMine)
-        {
-            playerControls.Player.Enable();
-        }
-    }
-
-    public override void OnDisable()
-    {
-        base.OnDisable();
-
-        if (photonView.IsMine)
-        {
-            playerControls.Player.Disable();
-        }
+        throwableItem.AddForce(new Vector2(direction * throwableSpeed, 0), ForceMode2D.Force);
     }
 }
