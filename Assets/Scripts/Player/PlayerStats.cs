@@ -13,7 +13,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
     private const float CourutineTimeStep = 0.25f;
 
     private const float healthHeal = 0.25f;
-    private const float staminaHeal = 4f;
+    private const float staminaHeal = 5f;
 
     private bool regenerateStamina;
     private bool staminaBurn;

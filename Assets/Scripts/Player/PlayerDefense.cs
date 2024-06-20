@@ -6,7 +6,7 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
     private PlayerControls playerControls;
 
     private const int DodgeCost = 10;
-    private const float DodgeStaminaBurn = 2.5f;
+    private const float DodgeStaminaBurn = 8f;
 
     private PlayerStats playerStats;
 

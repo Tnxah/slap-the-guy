@@ -47,9 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 15
   projectile: 0
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 256
+  teleports: 1
 --- !u!58 &3923167911490468604
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -138,7 +136,7 @@ GameObject:
   - component: {fileID: 5544821957952917584}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
