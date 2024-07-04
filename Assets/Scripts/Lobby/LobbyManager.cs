@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
@@ -31,7 +32,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            StartRoomSeeking();
+            //StartRoomSeeking();
         }
     }
 
@@ -63,32 +64,34 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         if (!string.IsNullOrEmpty(roomNameInput.text))
         {
             PhotonNetwork.CreateRoom(roomNameInput.text, new RoomOptions { MaxPlayers = maxPlayers }, TypedLobby.Default);
+            SceneManager.LoadScene("Battleground");
         }
     }
 
     public void JoinRoom(string roomName)
     {
-        PhotonNetwork.JoinRoom(roomName);
+        PlayerPrefs.SetString("RoomName", roomName);
+        SceneManager.LoadScene("Battleground");
     }
 
-    public void JoinRandomRoom()
-    {
-        PhotonNetwork.JoinRandomRoom();
-    }
+    //public void JoinRandomRoom()
+    //{
+    //    PhotonNetwork.JoinRandomRoom();
+    //}
 
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        int gameMode = PlayerPrefs.GetInt("GameMode");
-        if (gameMode == 1)
-        {
-            CreateMatchmakingRoom();
-        }
-        else
-        {
-            Debug.Log("Something went wrong. Create your own room");
-            //PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayers });
-        }
-    }
+    //public override void OnJoinRandomFailed(short returnCode, string message)
+    //{
+    //    int gameMode = PlayerPrefs.GetInt("GameMode");
+    //    if (gameMode == 1)
+    //    {
+    //        CreateMatchmakingRoom();
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Something went wrong. Create your own room");
+    //        //PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayers });
+    //    }
+    //}
 
     public void StartMatchmaking()
     {
@@ -103,14 +106,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom("Matchmaking_" + playerRating, roomOptions);
     }
 
-    public void StartRoomSeeking()
-    {
-        roomsMenu.SetActive(true);
-    }
+    //public void StartRoomSeeking()
+    //{
+    //    roomsMenu.SetActive(true);
+    //}
 
-    public override void OnJoinedRoom()
-    {
-        Debug.Log("Joined Room.");
-        roomsMenu.SetActive(false);
-    }
+    //public override void OnJoinedRoom()
+    //{
+    //    Debug.Log("Joined Room.");
+    //    roomsMenu.SetActive(false);
+    //}
 }

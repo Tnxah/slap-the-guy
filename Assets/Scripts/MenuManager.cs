@@ -8,12 +8,12 @@ public class MenuManager : MonoBehaviour
     public void OnFreePlay()
     {
         PlayerPrefs.SetInt("GameMode", 0); // 0 for Free Play
-        SceneManager.LoadScene("Battleground");
+        SceneManager.LoadScene("Lobby");
     }
 
     public void OnMatchmaking()
     {
         PlayerPrefs.SetInt("GameMode", 1); // 1 for Matchmaking
-        SceneManager.LoadScene("Battleground");
+        SceneManager.LoadScene("Lobby");
     }
 }
