@@ -20,11 +20,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
         playerStats = gameObject.GetComponent<PlayerStats>();
         playerCombat = gameObject.GetComponent<PlayerCombat>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
+
+        GameplayController.onGameStart += OnGameStart;
     }
 
     private void OnGameStart()
     {
-        EnableControls();
+        EnableAttack();
     }
 
     public void EnableAttack()
@@ -32,6 +34,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             playerControls.Player.Attack.Enable();
+            playerControls.Player.Throw.Enable();
+            playerControls.Player.Dodge.Enable();
         }
     }
 
@@ -40,6 +44,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             playerControls.Player.Attack.Disable();
+            playerControls.Player.Throw.Disable();
+            playerControls.Player.Dodge.Disable();
         }
     }
 
@@ -64,7 +70,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         base.OnEnable();
         EnableControls(); //not sure about enabling from player appear
                             //maybe should wait until game start
-        //DisableAttack();
+        DisableAttack();
     }
 
     public override void OnDisable()
