@@ -11,10 +11,14 @@ public class VotingManager : MonoBehaviourPunCallbacks
     private const int minVotes = 3;
     private int requiredVotes;
 
-    public Button voteButton;
+    [SerializeField]
+    private Button voteButton;
 
-    private void Start()
+    private GameplayController gameplayController;
+
+    private void Awake()
     {
+        gameplayController = GetComponent<GameplayController>();
         requiredVotes = 3;
     }
     
@@ -31,35 +35,34 @@ public class VotingManager : MonoBehaviourPunCallbacks
 
         if (votes >= requiredVotes && votes >= minVotes)
         {
-            photonView.RPC("StartGame", RpcTarget.All);
+            //photonView.RPC("StartGame", RpcTarget.All);
+            StartGame();
         }
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        requiredVotes = PhotonNetwork.CurrentRoom.PlayerCount;
-        votes = 0;
-        ResetVoteButton();
+        ResetVoting();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        requiredVotes = PhotonNetwork.CurrentRoom.PlayerCount;
-        votes = 0;
-        ResetVoteButton();
+        ResetVoting();
     }
 
-    private void ResetVoteButton()
+    private void ResetVoting()
     {
-        if (!GameplayController.isStarted)
-        // Reset the vote button for all players
-        voteButton.gameObject.SetActive(true);
+        if (!gameplayController.isStarted)
+        {
+            requiredVotes = PhotonNetwork.CurrentRoom.PlayerCount;
+            votes = 0;
+            voteButton.gameObject.SetActive(true);
+        }
     }
 
-    [PunRPC]
-    void StartGame()
+    private void StartGame()
     {
         Debug.Log("Game Starting!");
-        GameplayController.StartGame();
+        gameplayController.StartGame();
     }
 }

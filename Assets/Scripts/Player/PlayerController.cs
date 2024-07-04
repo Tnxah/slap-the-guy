@@ -1,5 +1,4 @@
 using Photon.Pun;
-using UnityEngine;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
@@ -68,8 +67,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public override void OnEnable()
     {
         base.OnEnable();
-        EnableControls(); //not sure about enabling from player appear
-                            //maybe should wait until game start
+        EnableControls();    
         DisableAttack();
     }
 

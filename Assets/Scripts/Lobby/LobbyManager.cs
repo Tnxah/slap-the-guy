@@ -1,6 +1,5 @@
 using Photon.Pun;
 using Photon.Realtime;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,8 +8,6 @@ using UnityEngine.UI;
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
     private const int maxPlayers = 5;
-
-    public static event Action onJoinedRoomCallback;
 
     public TMP_InputField roomNameInput;
 
@@ -115,6 +112,5 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Joined Room.");
         roomsMenu.SetActive(false);
-        onJoinedRoomCallback?.Invoke();
     }
 }
