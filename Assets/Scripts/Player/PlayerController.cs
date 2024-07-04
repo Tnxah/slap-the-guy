@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             playerControls = new PlayerControls();
+            GameplayController.onGameStart += OnGameStart;
         }
 
         animationController = gameObject.GetComponent<AnimationController>();
@@ -20,12 +21,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
         playerCombat = gameObject.GetComponent<PlayerCombat>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
 
-        GameplayController.onGameStart += OnGameStart;
     }
 
     private void OnGameStart()
     {
-        EnableAttack();
+        if(photonView.IsMine)
+            EnableAttack();
     }
 
     public void EnableAttack()

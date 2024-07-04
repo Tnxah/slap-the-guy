@@ -19,7 +19,7 @@ public class VotingManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         gameplayController = GetComponent<GameplayController>();
-        requiredVotes = 3;
+        requiredVotes = minVotes;
     }
     
     public void OnVoteButton()
@@ -35,7 +35,6 @@ public class VotingManager : MonoBehaviourPunCallbacks
 
         if (votes >= requiredVotes && votes >= minVotes)
         {
-            //photonView.RPC("StartGame", RpcTarget.All);
             StartGame();
         }
     }
@@ -50,14 +49,29 @@ public class VotingManager : MonoBehaviourPunCallbacks
         ResetVoting();
     }
 
+    public override void OnJoinedRoom()
+    {
+        ResetVoting();
+    }
+
     private void ResetVoting()
     {
         if (!gameplayController.isStarted)
         {
-            requiredVotes = PhotonNetwork.CurrentRoom.PlayerCount;
+            requiredVotes = GetRequiredVotes();
             votes = 0;
-            voteButton.gameObject.SetActive(true);
+            voteButton.gameObject.SetActive(IsEnoughPlayers());
         }
+    }
+
+    private bool IsEnoughPlayers()
+    {
+        return PhotonNetwork.CurrentRoom.PlayerCount >= minVotes;
+    }
+
+    private int GetRequiredVotes()
+    {
+        return PhotonNetwork.CurrentRoom.PlayerCount >= 3 ? PhotonNetwork.CurrentRoom.PlayerCount : minVotes;
     }
 
     private void StartGame()
