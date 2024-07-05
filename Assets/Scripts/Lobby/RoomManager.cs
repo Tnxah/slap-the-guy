@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
-    public GameplayController gameplayController;
+    private GameplayController gameplayController;
 
     private Dictionary<Player, Transform> playerSpawnPoints = new Dictionary<Player, Transform>();
 
