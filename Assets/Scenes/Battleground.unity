@@ -628,7 +628,6 @@ GameObject:
   - component: {fileID: 357692655}
   - component: {fileID: 357692654}
   - component: {fileID: 357692658}
-  - component: {fileID: 357692660}
   m_Layer: 0
   m_Name: GameplayController
   m_TagString: Untagged
@@ -716,18 +715,6 @@ MonoBehaviour:
   - {fileID: 1477779041}
   - {fileID: 1265028810}
   - {fileID: 1532316028}
---- !u!114 &357692660
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 357692653}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78b9219f11583fe41af10b9273f53903, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &383917520
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,8 +13,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public TMP_InputField roomNameInput;
 
     [SerializeField]
-    private GameObject roomsMenu;
-    [SerializeField]
     private GameObject roomListContent;
     [SerializeField]
     private GameObject roomListItemPrefab;
@@ -32,7 +30,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            //StartRoomSeeking();
+           
         }
     }
 
@@ -45,8 +43,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
+        var skipFirst = true;
         foreach (Transform child in roomListContent.transform)
         {
+            if (skipFirst)
+            {
+                skipFirst = false;
+                continue; 
+            }
+
             Destroy(child.gameObject);
         }
 
@@ -63,15 +68,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         if (!string.IsNullOrEmpty(roomNameInput.text))
         {
-            PhotonNetwork.CreateRoom(roomNameInput.text, new RoomOptions { MaxPlayers = maxPlayers }, TypedLobby.Default);
             SceneManager.LoadScene("Battleground");
+            PhotonNetwork.JoinOrCreateRoom(roomNameInput.text, new RoomOptions { MaxPlayers = maxPlayers }, TypedLobby.Default);
         }
     }
 
     public void JoinRoom(string roomName)
     {
-        PlayerPrefs.SetString("RoomName", roomName);
         SceneManager.LoadScene("Battleground");
+        PhotonNetwork.JoinRoom(roomName);
     }
 
     //public void JoinRandomRoom()
@@ -105,15 +110,4 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions { MaxPlayers = maxPlayers };
         PhotonNetwork.CreateRoom("Matchmaking_" + playerRating, roomOptions);
     }
-
-    //public void StartRoomSeeking()
-    //{
-    //    roomsMenu.SetActive(true);
-    //}
-
-    //public override void OnJoinedRoom()
-    //{
-    //    Debug.Log("Joined Room.");
-    //    roomsMenu.SetActive(false);
-    //}
 }
