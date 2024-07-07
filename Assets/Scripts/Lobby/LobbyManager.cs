@@ -19,6 +19,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     private List<RoomInfo> roomList = new List<RoomInfo>();
 
+    private Dictionary<string, GameObject> rooms = new Dictionary<string, GameObject>();
+
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
@@ -43,24 +45,20 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        var skipFirst = true;
-        foreach (Transform child in roomListContent.transform)
-        {
-            if (skipFirst)
-            {
-                skipFirst = false;
-                continue; 
-            }
-
-            Destroy(child.gameObject);
-        }
-
-        this.roomList = roomList;
         foreach (RoomInfo roomInfo in roomList)
         {
-            GameObject roomListItem = Instantiate(roomListItemPrefab, roomListContent.transform);
-            roomListItem.GetComponentInChildren<TextMeshProUGUI>().text = roomInfo.Name;
-            roomListItem.GetComponentInChildren<Button>().onClick.AddListener(() => JoinRoom(roomInfo.Name));
+            if (roomInfo.RemovedFromList || !roomInfo.IsOpen || !roomInfo.IsVisible)
+            {
+                Destroy(rooms[roomInfo.Name]);
+                rooms.Remove(roomInfo.Name);
+            }
+            else if(!rooms.ContainsKey(roomInfo.Name))
+            {
+                GameObject roomListItem = Instantiate(roomListItemPrefab, roomListContent.transform);
+                roomListItem.GetComponentInChildren<TextMeshProUGUI>().text = roomInfo.Name;
+                roomListItem.GetComponentInChildren<Button>().onClick.AddListener(() => JoinRoom(roomInfo.Name));
+                rooms.Add(roomInfo.Name, roomListItem);
+            }
         }
     }
 
