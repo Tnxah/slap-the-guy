@@ -1,26 +1,23 @@
 using Photon.Pun;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneNavigator : MonoBehaviourPunCallbacks
+public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
 {
     private PlayerControls playerControls;
 
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-
         playerControls = new PlayerControls();
         playerControls.Player.Back.performed += _ => Back();
     }
 
     private void Back()
     {
-        if (SceneManager.GetActiveScene().buildIndex > 0)
+        if (PhotonNetwork.IsConnectedAndReady)
         {
-            if (SceneManager.GetActiveScene().Equals("Battleground"))
-                PhotonNetwork.LeaveRoom();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+            PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+            PhotonNetwork.LeaveRoom();
+            SceneManager.LoadScene("Lobby");
         }
     }
 
