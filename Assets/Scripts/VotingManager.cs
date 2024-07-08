@@ -73,6 +73,7 @@ public class VotingManager : MonoBehaviourPunCallbacks
 
     private void SetVotesText()
     {
+        votesText.gameObject.SetActive(true);
         votesText.text = $"{votes}/{GetRequiredVotes()}";
     }
 

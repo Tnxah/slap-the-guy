@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     private PlayerController controller;
     private PlayerControls playerControls;
 
+    private const float ControllerDeadZone = 0.2f;
+
     private int direction;
 
     private void Awake()
@@ -30,7 +32,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Rotate(InputAction.CallbackContext ctx)
     {
-        photonView.RPC("PunRPC_Rotate", RpcTarget.All, (int)ctx.ReadValue<float>());
+        var rawValue = ctx.ReadValue<float>();
+
+        if (rawValue < ControllerDeadZone && rawValue > -ControllerDeadZone) { //handle controller dead zone
+            return;
+        }
+        int value = (int)Mathf.Sign(rawValue);
+
+        photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
     }
 
     [PunRPC]
