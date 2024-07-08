@@ -74,6 +74,13 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
         var direction = controller.playerMovement.GetDirection();
 
+        throwableItem.gameObject.GetComponent<ThrownItem>().SetOwner(photonView);
+
         throwableItem.AddForce(new Vector2(direction * throwableSpeed, 0), ForceMode2D.Force);
+
+        if (photonView.IsMine)
+        {
+            RoundStats.ItemThrown();
+        }
     }
 }

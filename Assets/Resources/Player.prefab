@@ -46,8 +46,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 15
-  projectile: 0
-  teleports: 1
 --- !u!58 &3923167911490468604
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,8 @@ public class ThrownItem : MonoBehaviour
     [SerializeField]
     private int damage;
     private int rotationSpeed;
+
+    private PhotonView projectileOwner;
 
     public int teleportations = 1;
 
@@ -19,9 +22,14 @@ public class ThrownItem : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent(out IDamageable target))
         {
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, projectileOwner);
             Destroy(gameObject);
         }
+    }
+
+    public void SetOwner(PhotonView owner)
+    {
+        projectileOwner = owner;
     }
 
     private void FixedUpdate()

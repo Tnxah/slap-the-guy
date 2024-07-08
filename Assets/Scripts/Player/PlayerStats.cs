@@ -34,17 +34,31 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
     }
 
     //===HEALTH===
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, PhotonView damageOwner)
     {
         health -= amount;
 
         controller.animationController.HurtAnimation();
 
-        if(photonView.IsMine)
+        if (photonView.IsMine)
+        {
             statsBar.SetHealth(health);
+            RoundStats.DamageReceived(amount);
+        }
+
+        if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks damage for damage owner (but not damage from self)
+        {
+            RoundStats.DamageDealt(amount);
+        }
 
         if (health <= 0)
+        {
+            if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks death for killer (but not suicide)
+            {
+                RoundStats.PlayerKnocked();
+            }
             Die();
+        }
     }
 
     private void Die()

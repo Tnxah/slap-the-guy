@@ -1,20 +1,9 @@
+using Photon.Pun;
 using UnityEngine;
 
 public class DamagePoint : MonoBehaviour
 {
     public int damage;
-
-    public bool projectile;
-
-    private int rotationSpeed;
-
-    public int teleports = 1;
-
-    private void Start()
-    {
-        print($"Start with {teleports}");
-        rotationSpeed = Random.Range(5, 30);
-    }
 
     private void OnEnable()
     {
@@ -23,7 +12,11 @@ public class DamagePoint : MonoBehaviour
         {
             if (collider.gameObject.TryGetComponent(out IDamageable target))
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(damage, PhotonView.Get(transform.parent));
+                if (PhotonView.Get(transform.parent).IsMine)
+                {
+                    RoundStats.Hited();
+                }
                 return;
             }
         }
