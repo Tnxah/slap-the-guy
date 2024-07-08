@@ -2,6 +2,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,10 @@ public class VotingManager : MonoBehaviourPunCallbacks
 
     [SerializeField]
     private Button voteButton;
+    [SerializeField]
+    private TextMeshProUGUI votesText;
+    [SerializeField]
+    private TextMeshProUGUI readyText;
 
     private GameplayController gameplayController;
 
@@ -32,10 +37,11 @@ public class VotingManager : MonoBehaviourPunCallbacks
     void VoteToStart()
     {
         votes++;
+        SetVotesText();
 
         if (votes >= requiredVotes && votes >= minVotes)
         {
-            StartGame();
+            StartCoroutine(StartGame());
         }
     }
 
@@ -60,8 +66,14 @@ public class VotingManager : MonoBehaviourPunCallbacks
         {
             requiredVotes = GetRequiredVotes();
             votes = 0;
+            SetVotesText();
             voteButton.gameObject.SetActive(IsEnoughPlayers());
         }
+    }
+
+    private void SetVotesText()
+    {
+        votesText.text = $"{votes}/{GetRequiredVotes()}";
     }
 
     private bool IsEnoughPlayers()
@@ -74,9 +86,34 @@ public class VotingManager : MonoBehaviourPunCallbacks
         return PhotonNetwork.CurrentRoom.PlayerCount >= 3 ? PhotonNetwork.CurrentRoom.PlayerCount : minVotes;
     }
 
-    private void StartGame()
+    private IEnumerator StartGame()
     {
         Debug.Log("Game Starting!");
+        votesText.gameObject.SetActive(false);
+
+        for (int i = 0; i < 3; i++) {
+            
+            yield return new WaitForSeconds(1);
+            
+            switch (i) {
+                case 0:
+                    readyText.gameObject.SetActive(true);
+                    readyText.text = "READY";
+                    break;
+
+                case 1:
+                    readyText.text = "SET";
+                    break;
+
+                case 2:
+                    readyText.text = "FIGHT";
+                    break;
+            }
+        } 
         gameplayController.StartGame();
+
+        yield return new WaitForSeconds(1);
+
+        readyText.gameObject.SetActive(false);
     }
 }
