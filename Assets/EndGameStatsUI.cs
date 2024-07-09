@@ -18,6 +18,12 @@ public class EndGameStatsUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI timeInDodge;
 
+    private void Awake()
+    {
+        gameObject.SetActive(false);
+        GameplayController.onGameEnd += () => gameObject.SetActive(true); //TODO move to some UIController and get rid of setactive false
+    }
+
     private void RefreshStats()
     {
         playersKnocked.text = RoundStats.playersKnocked.ToString();

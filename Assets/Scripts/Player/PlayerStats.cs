@@ -67,6 +67,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
         {
             PhotonNetwork.Destroy(gameObject);
         }
+        GameplayController.PlayerDies();
     }
 
     //===STAMINA===

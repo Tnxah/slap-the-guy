@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             playerControls = new PlayerControls();
             GameplayController.onGameStart += OnGameStart;
+            GameplayController.onGameEnd += OnGameEnd;
         }
 
         animationController = gameObject.GetComponent<AnimationController>();
@@ -27,6 +28,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if(photonView.IsMine)
             EnableAttack();
+    }
+    private void OnGameEnd()
+    {
+        if(photonView.IsMine)
+            DisableAttack();
     }
 
     public void EnableAttack()
