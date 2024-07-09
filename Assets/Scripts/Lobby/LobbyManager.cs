@@ -49,6 +49,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         {
             if (roomInfo.RemovedFromList || !roomInfo.IsOpen || !roomInfo.IsVisible)
             {
+                if (!rooms.ContainsKey(roomInfo.Name))
+                    return;
+
                 Destroy(rooms[roomInfo.Name]);
                 rooms.Remove(roomInfo.Name);
             }

@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class RoundStats : MonoBehaviour
 {
-    private static int playersKnocked;
-    private static int damageDealt;
-    private static int damageReceived;
-    private static int itemsThrowned;
-    private static int hits;
-    private static float timeInDodge;
+    public static int playersKnocked { private set; get; }
+    public static int damageDealt { private set; get; }
+    public static int damageReceived { private set; get; }
+    public static int itemsThrown { private set; get; }
+    public static int hits { private set; get; }
+    public static float timeInDodge { private set; get; }
 
     public static void ClearStats()
     {
         playersKnocked = 0;
         damageDealt = 0;
         damageReceived = 0;
-        itemsThrowned = 0;
+        itemsThrown = 0;
         hits = 0;
         timeInDodge = 0;
     }
@@ -38,7 +38,7 @@ public class RoundStats : MonoBehaviour
 
     public static void ItemThrown()
     {
-        itemsThrowned++;
+        itemsThrown++;
     }
 
     public static void Hited()
