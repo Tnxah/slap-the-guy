@@ -73,4 +73,13 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
             animationController.DodgeToIdleAnimation();
         }
     }
+
+    public override void OnDisable()
+    {
+        if (photonView.IsMine)
+        {
+            playerControls.Player.Dodge.performed -= ctx => DodgeStart();
+            playerControls.Player.Dodge.canceled -= ctx => DodgeEnd();
+        }
+    }
 }

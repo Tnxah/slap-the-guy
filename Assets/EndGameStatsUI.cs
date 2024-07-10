@@ -21,7 +21,13 @@ public class EndGameStatsUI : MonoBehaviour
     private void Awake()
     {
         gameObject.SetActive(false);
-        GameplayController.onGameEnd += () => gameObject.SetActive(true); //TODO move to some UIController and get rid of setactive false
+        Debug.Log("SUB");
+        GameplayController.onGameEnd += EnableGameStats; //TODO move to some UIController and get rid of setactive false
+    }
+
+    private void EnableGameStats()
+    {
+        gameObject.SetActive(true);
     }
 
     private void RefreshStats()
@@ -32,10 +38,18 @@ public class EndGameStatsUI : MonoBehaviour
         itemsThrown.text = RoundStats.itemsThrown.ToString();
         hits.text = RoundStats.hits.ToString();
         timeInDodge.text = ((int)RoundStats.timeInDodge).ToString();
+
+        RoundStats.ClearStats();
     }
 
     private void OnEnable()
     {
         RefreshStats();
+    }
+
+    private void OnDestroy()
+    {
+        GameplayController.onGameEnd -= EnableGameStats;
+        Debug.Log("UNSUB");
     }
 }

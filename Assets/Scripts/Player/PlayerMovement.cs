@@ -67,4 +67,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     {
         gameObject.transform.localScale = new Vector3(direction, 1, 1);
     }
+
+    public override void OnDisable()
+    {
+        if (photonView.IsMine)
+            playerControls.Player.Rotate.performed -= ctx => Rotate(ctx);
+    }
 }

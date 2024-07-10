@@ -82,5 +82,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         base.OnDisable();
         DisableControls();
+
+        if (photonView.IsMine)
+        {
+            GameplayController.onGameStart -= OnGameStart;
+            GameplayController.onGameEnd -= OnGameEnd;
+        }
     }
 }

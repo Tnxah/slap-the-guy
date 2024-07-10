@@ -83,4 +83,13 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
             RoundStats.ItemThrown();
         }
     }
+
+    public override void OnDisable()
+    {
+        if (photonView.IsMine)
+        {
+            playerControls.Player.Attack.performed -= _ => Attack();
+            playerControls.Player.Throw.performed -= _ => Throw();
+        }
+    }
 }
