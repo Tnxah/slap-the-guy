@@ -1,4 +1,5 @@
 using Photon.Pun;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
@@ -8,6 +9,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public PlayerMovement playerMovement;
     public PlayerControls playerControls { get; private set; }
 
+    [SerializeField]
+    private GameObject pointer;
+
     private void Awake()
     {
         if (photonView.IsMine)
@@ -15,6 +19,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             playerControls = new PlayerControls();
             GameplayController.onGameStart += OnGameStart;
             GameplayController.onGameEnd += OnGameEnd;
+            pointer.SetActive(true);
         }
 
         animationController = gameObject.GetComponent<AnimationController>();
