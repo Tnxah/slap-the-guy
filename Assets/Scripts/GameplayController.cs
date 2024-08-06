@@ -38,7 +38,7 @@ public class GameplayController : MonoBehaviourPunCallbacks
     {
         if (isStarted)
         {
-            isStarted = false;
+            //isStarted = false;
             onGameEnd?.Invoke();
         }
     }

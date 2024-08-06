@@ -1,5 +1,7 @@
 using Photon.Pun;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerDefense : MonoBehaviourPunCallbacks
 {
@@ -25,7 +27,11 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
         {
             playerControls = controller.playerControls;
 
+#if PLATFORM_ANDROID
+            playerControls.Player.Dodge.performed += ctx => StartCoroutine(TouchscreenDodgeStart());
+#else 
             playerControls.Player.Dodge.performed += ctx => DodgeStart();
+#endif
             playerControls.Player.Dodge.canceled += ctx => DodgeEnd();
         }
 
@@ -44,11 +50,26 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
         }
     }
 
+    private IEnumerator TouchscreenDodgeStart()
+    {
+        var startPos = playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y;
+
+        yield return new WaitForSeconds(0.1f);
+
+        var direction = startPos - playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y;
+
+        if (direction > 20 && playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2) 
+        {
+            print("TouchscreenDodgeStart");
+            DodgeStart();
+        }
+    }
+
     private void DodgeEnd()
     {
         playerStats.StopStaminaBurn();
 
-        if (photonView.IsMine && dodging)
+        if (photonView.IsMine)
         {
             RoundStats.DodgedSeconds(Time.time - dodgeStartTime);
         }

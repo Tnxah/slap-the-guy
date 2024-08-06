@@ -1,5 +1,4 @@
 using Photon.Pun;
-using Photon.Pun.Demo.SlotRacer;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,14 +33,23 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
             playerControls = controller.playerControls;
 
             playerControls.Player.Attack.performed += _ => Attack();
+
             playerControls.Player.Throw.performed += _ => Throw();
         }
     }
 
     private void Attack()
     {
+#if PLATFORM_ANDROID
+        if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y > Screen.height / 2)
+            return;
+#endif
+
         if (controller.playerStats.TryUseStamina(AttackCost))
+        {
+            print("Attack");
             photonView.RPC("PunRPC_Attack", RpcTarget.All);
+        }
     }
 
     [PunRPC]
@@ -52,6 +60,11 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
     private void Throw()
     {
+#if PLATFORM_ANDROID
+        if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y < Screen.height / 2)
+            return;
+#endif
+
         if (controller.playerStats.TryUseStamina(ThrowCost))
         {
             var randomId = random.Next(0, throwablePrefabs.Count);

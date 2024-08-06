@@ -65,6 +65,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             playerControls.Player.Enable();
+#if PLATFORM_ANDROID
+            playerControls.TouchscreenHelper.Enable();
+#endif
         }
     }
 
@@ -73,6 +76,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             playerControls.Player.Disable();
+#if PLATFORM_ANDROID
+            playerControls.TouchscreenHelper.Disable();
+#endif
         }
     }
 

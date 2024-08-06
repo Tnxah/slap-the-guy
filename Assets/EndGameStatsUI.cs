@@ -50,6 +50,5 @@ public class EndGameStatsUI : MonoBehaviour
     private void OnDestroy()
     {
         GameplayController.onGameEnd -= EnableGameStats;
-        Debug.Log("UNSUB");
     }
 }

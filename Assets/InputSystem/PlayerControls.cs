@@ -161,6 +161,39 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""f102550a-552d-4653-b4a3-6ba45185ad0f"",
+                    ""path"": ""1DAxis(minValue=-5,maxValue=5)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""981000fd-0adb-42ed-99ec-0bc4d5c3e85f"",
+                    ""path"": ""<Touchscreen>/delta/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""24b75801-8fb0-45f3-9c5e-261b3bb8d15a"",
+                    ""path"": ""<Touchscreen>/delta/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
                     ""name"": """",
                     ""id"": ""002a5183-a93c-4b28-93e3-9b06c6211f62"",
                     ""path"": ""<Keyboard>/shift"",
@@ -184,6 +217,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""63640840-8daa-4faf-8790-5b269eddca7b"",
+                    ""path"": ""<Touchscreen>/Press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dodge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""c7e5f808-31f8-4d3b-a545-c3b71b92eb83"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
@@ -198,6 +242,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""id"": ""deab97cd-dc6c-4841-8a5b-bbcaaf209f37"",
                     ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5f02055c-b6e4-48c4-8e2a-1c29e0a08439"",
+                    ""path"": ""<Touchscreen>/Press"",
+                    ""interactions"": ""Tap"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Attack"",
@@ -247,6 +302,45 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Back"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f1f052b8-79af-4c45-80b6-34a1d1117636"",
+                    ""path"": ""<Touchscreen>/Press"",
+                    ""interactions"": ""Tap"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Throw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Touchscreen Helper"",
+            ""id"": ""b9c8d7c9-d280-4906-b259-cf5ea211a87f"",
+            ""actions"": [
+                {
+                    ""name"": ""Position"",
+                    ""type"": ""Value"",
+                    ""id"": ""a888a37a-ba49-4204-9937-e4942fcdb87f"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""93e5dcb8-e89a-488f-9f7f-3df9f4a9bf7d"",
+                    ""path"": ""<Touchscreen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -278,6 +372,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Fake = m_Player.FindAction("Fake", throwIfNotFound: true);
         m_Player_Throw = m_Player.FindAction("Throw", throwIfNotFound: true);
         m_Player_Back = m_Player.FindAction("Back", throwIfNotFound: true);
+        // Touchscreen Helper
+        m_TouchscreenHelper = asset.FindActionMap("Touchscreen Helper", throwIfNotFound: true);
+        m_TouchscreenHelper_Position = m_TouchscreenHelper.FindAction("Position", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -421,6 +518,52 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Touchscreen Helper
+    private readonly InputActionMap m_TouchscreenHelper;
+    private List<ITouchscreenHelperActions> m_TouchscreenHelperActionsCallbackInterfaces = new List<ITouchscreenHelperActions>();
+    private readonly InputAction m_TouchscreenHelper_Position;
+    public struct TouchscreenHelperActions
+    {
+        private @PlayerControls m_Wrapper;
+        public TouchscreenHelperActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Position => m_Wrapper.m_TouchscreenHelper_Position;
+        public InputActionMap Get() { return m_Wrapper.m_TouchscreenHelper; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TouchscreenHelperActions set) { return set.Get(); }
+        public void AddCallbacks(ITouchscreenHelperActions instance)
+        {
+            if (instance == null || m_Wrapper.m_TouchscreenHelperActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_TouchscreenHelperActionsCallbackInterfaces.Add(instance);
+            @Position.started += instance.OnPosition;
+            @Position.performed += instance.OnPosition;
+            @Position.canceled += instance.OnPosition;
+        }
+
+        private void UnregisterCallbacks(ITouchscreenHelperActions instance)
+        {
+            @Position.started -= instance.OnPosition;
+            @Position.performed -= instance.OnPosition;
+            @Position.canceled -= instance.OnPosition;
+        }
+
+        public void RemoveCallbacks(ITouchscreenHelperActions instance)
+        {
+            if (m_Wrapper.m_TouchscreenHelperActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ITouchscreenHelperActions instance)
+        {
+            foreach (var item in m_Wrapper.m_TouchscreenHelperActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_TouchscreenHelperActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public TouchscreenHelperActions @TouchscreenHelper => new TouchscreenHelperActions(this);
     private int m_keyboardandmouseSchemeIndex = -1;
     public InputControlScheme keyboardandmouseScheme
     {
@@ -438,5 +581,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnFake(InputAction.CallbackContext context);
         void OnThrow(InputAction.CallbackContext context);
         void OnBack(InputAction.CallbackContext context);
+    }
+    public interface ITouchscreenHelperActions
+    {
+        void OnPosition(InputAction.CallbackContext context);
     }
 }

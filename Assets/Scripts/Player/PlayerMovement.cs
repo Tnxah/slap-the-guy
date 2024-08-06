@@ -7,8 +7,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     private PlayerController controller;
     private PlayerControls playerControls;
 
-    private const float ControllerDeadZone = 0.2f;
-
+#if PLATFORM_ANDROID
+    private const float InputDeadZone = 200f;
+#else
+    private const float InputDeadZone = 0.2f;
+#endif
     private int direction;
 
     private void Awake()
@@ -32,13 +35,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Rotate(InputAction.CallbackContext ctx)
     {
-        var rawValue = ctx.ReadValue<float>();
+#if PLATFORM_ANDROID
+        if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x > Screen.width/ 2)
+            return;
+#endif
 
-        if (rawValue < ControllerDeadZone && rawValue > -ControllerDeadZone) { //handle controller dead zone
+        var rawValue = ctx.ReadValue<float>();
+        if (rawValue < InputDeadZone && rawValue > -InputDeadZone) { //handle dead zone
             return;
         }
         int value = (int)Mathf.Sign(rawValue);
 
+        print("Rotate");
         photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
     }
 

@@ -9,11 +9,10 @@ public class AuthenticationManager : MonoBehaviour
 {
     private void Awake()
     {
+#if PLATFORM_ANDROID && !UNITY_EDITOR
         PlayGamesPlatform.Activate();
-    }
-    private void Start()
-    {
         AuthenticateWithGooglePlay();
+#endif
     }
 
     private void AuthenticateWithGooglePlay()
