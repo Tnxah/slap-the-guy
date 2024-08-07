@@ -235,6 +235,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   throwablePrefabs:
   - {fileID: 1963784732834475928, guid: 1d0cc13343583d349924b7eb4594add9, type: 3}
+  - {fileID: 1963784732834475928, guid: 70a9e696e27214747bdd44b375dda8c9, type: 3}
   throwPoint: {fileID: 1177938219133155932}
 --- !u!114 &1877188844436306574
 MonoBehaviour:
