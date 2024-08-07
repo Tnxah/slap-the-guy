@@ -69,7 +69,7 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
     {
         playerStats.StopStaminaBurn();
 
-        if (photonView.IsMine)
+        if (photonView.IsMine && dodging)
         {
             RoundStats.DodgedSeconds(Time.time - dodgeStartTime);
         }

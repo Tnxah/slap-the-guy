@@ -30,4 +30,10 @@ public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
     {
         playerControls.Player.Back.Disable();
     }
+
+    private void OnApplicationQuit()
+    {
+        PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+        PhotonNetwork.LeaveRoom();
+    }
 }

@@ -44,20 +44,20 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
         {
             statsBar.SetHealth(health);
             RoundStats.DamageReceived(amount);
+        }
+        if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks damage for damage owner (but not damage from self)
+        {
+            RoundStats.DamageDealt(amount);
+        }
 
-            if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks damage for damage owner (but not damage from self)
+        if (health <= 0)
+        {
+            if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks death for killer (but not suicide)
             {
-                RoundStats.DamageDealt(amount);
+                RoundStats.PlayerKnocked();
             }
-
-            if (health <= 0)
-            {
-                if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks death for killer (but not suicide)
-                {
-                    RoundStats.PlayerKnocked();
-                }
-                photonView.RPC("PunRPC_Die", RpcTarget.All);
-            }
+            if(photonView.IsMine)
+            photonView.RPC("PunRPC_Die", RpcTarget.All);
         }
     }
 
