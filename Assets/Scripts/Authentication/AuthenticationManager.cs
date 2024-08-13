@@ -1,7 +1,6 @@
 using GooglePlayGames.BasicApi;
 using GooglePlayGames;
 using UnityEngine;
-using TMPro;
 using PlayFab.ClientModels;
 using PlayFab;
 

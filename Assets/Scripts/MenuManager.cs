@@ -16,4 +16,10 @@ public class MenuManager : MonoBehaviour
         PlayerPrefs.SetInt("GameMode", 1); // 1 for Matchmaking
         SceneManager.LoadScene("Lobby");
     }
+
+    public void OnShop()
+    {
+        PlayerPrefs.SetInt("GameMode", 0);
+        SceneManager.LoadScene("Shop");
+    }
 }

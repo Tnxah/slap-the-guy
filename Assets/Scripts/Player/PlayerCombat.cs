@@ -15,6 +15,8 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
     [SerializeField] //replace with Load from Recources
     private List<GameObject> throwablePrefabs = new List<GameObject>();
+
+    private List<int> availableThrowables = new List<int> { 0 };
     
     [SerializeField]
     private Transform throwPoint;
@@ -67,7 +69,7 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
         if (controller.playerStats.TryUseStamina(ThrowCost))
         {
-            var randomId = random.Next(0, throwablePrefabs.Count);
+            var randomId = availableThrowables[random.Next(0, availableThrowables.Count)];
             photonView.RPC("PunRPC_Throw", RpcTarget.All, randomId);
         }
     }
