@@ -105,7 +105,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Dodge"",
                     ""type"": ""Button"",
                     ""id"": ""1006987a-8095-420d-b5c3-dec1ce0caed2"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -141,7 +141,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Back"",
                     ""type"": ""Button"",
                     ""id"": ""52614e3f-be82-48f0-9acb-f15db9946fca"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
