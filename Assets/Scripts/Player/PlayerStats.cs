@@ -1,4 +1,6 @@
 using Photon.Pun;
+using RockInMyShoe.Global.DataStorage;
+using RockInMyShoe.Global.Eventing;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -23,6 +25,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
     private void Awake()
     {
         controller = GetComponent<PlayerController>();
+        EventBus.Subscribe<OnGameEndEvent>(CheckWin);
     }
 
     private void Start()
@@ -67,7 +70,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
         if (photonView.IsMine)
         {
             PhotonNetwork.Destroy(gameObject);
+            StatusStorage.SetStatus(BattleStatus.Lose);
         }
+        print("PunRPC_Die");
         GameplayController.PlayerDies();
     }
 
@@ -137,4 +142,26 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
             }
         }
     }
+
+    private void CheckWin(OnGameEndEvent evt)
+    {   
+        if(photonView.IsMine)
+
+        if(health > 0f)
+            StatusStorage.SetStatus(BattleStatus.Win);
+        else
+            StatusStorage.SetStatus(BattleStatus.Lose);
+
+        print("CheckWin" + StatusStorage.GetStatus<BattleStatus>());
+    }
+
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<OnGameEndEvent>(CheckWin);
+    }
+}
+
+public class OnPlayerDieEvent
+{
+    public bool isMine;
 }

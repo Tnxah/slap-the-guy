@@ -219,6 +219,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5029818}
   - component: {fileID: 5029817}
+  - component: {fileID: 5029819}
+  - component: {fileID: 5029820}
   m_Layer: 0
   m_Name: AuthenticationManager
   m_TagString: Untagged
@@ -253,6 +255,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5029819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91fbfb399e681404e883d01dc1e38262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AdsManager
+--- !u!114 &5029820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c45084bc0b249d142a8581e57872c397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RemoteConfigManager
 --- !u!1 &199007414
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
+using RockInMyShoe.Global.Eventing;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,7 +10,7 @@ using UnityEngine.UI;
 public class VotingManager : MonoBehaviourPunCallbacks
 {
     private int votes = 0;
-    private const int minVotes = 3;
+    private int minVotes = 3;
     private int requiredVotes;
 
     [SerializeField]
@@ -24,6 +25,7 @@ public class VotingManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         gameplayController = GetComponent<GameplayController>();
+        EventBus.Subscribe<OnRemoteConfigValuesFetched>(RetrieveMinPlayers, true);
         requiredVotes = minVotes;
     }
     
@@ -84,7 +86,10 @@ public class VotingManager : MonoBehaviourPunCallbacks
 
     private int GetRequiredVotes()
     {
-        return PhotonNetwork.CurrentRoom.PlayerCount >= 3 ? PhotonNetwork.CurrentRoom.PlayerCount : minVotes;
+        print(PhotonNetwork.CurrentRoom.PlayerCount);
+        print(minVotes);
+        
+        return PhotonNetwork.CurrentRoom.PlayerCount > minVotes ? PhotonNetwork.CurrentRoom.PlayerCount : minVotes;
     }
 
     private IEnumerator StartGame()
@@ -116,5 +121,11 @@ public class VotingManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(1);
 
         readyText.gameObject.SetActive(false);
+    }
+
+    private void RetrieveMinPlayers(OnRemoteConfigValuesFetched evt)
+    {
+        minVotes = evt.appConfig.GetInt("MinAmountOfPlayers", minVotes);
+        requiredVotes = PhotonNetwork.CurrentRoom == null ? minVotes : GetRequiredVotes();
     }
 }

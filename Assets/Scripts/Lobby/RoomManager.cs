@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
+using RockInMyShoe.Global.DataStorage;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -34,6 +35,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Player left: " + otherPlayer.NickName);
         OnPlayerEnteredOrLeft();
+        GameplayController.PlayerDies();
     }
 
     [PunRPC]
@@ -113,5 +115,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         base.OnJoinedRoom();
         CreatePlayer();
         OnPlayerEnteredOrLeft();
+
+        StatusStorage.SetStatus(BattleStatus.None);
     }
 }

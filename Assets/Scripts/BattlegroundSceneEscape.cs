@@ -1,4 +1,6 @@
 using Photon.Pun;
+using RockInMyShoe.Global.DataStorage;
+using RockInMyShoe.Global.Eventing;
 using UnityEngine.SceneManagement;
 
 public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
@@ -17,6 +19,9 @@ public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
             PhotonNetwork.LeaveRoom();
+            var status = StatusStorage.GetStatus<BattleStatus>();
+            EventBus.Publish(new BackToLobbyEvent { status =  status});
+            print("BackToLobbyEvent" + status);
             SceneManager.LoadScene("Lobby");
         }
     }
@@ -36,4 +41,15 @@ public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
         PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
         PhotonNetwork.LeaveRoom();
     }
+}
+
+public sealed class BackToLobbyEvent { 
+    public BattleStatus status;
+}
+
+public enum BattleStatus
+{
+    None,
+    Win,
+    Lose
 }

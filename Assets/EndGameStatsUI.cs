@@ -1,3 +1,4 @@
+using RockInMyShoe.Global.Eventing;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -21,11 +22,11 @@ public class EndGameStatsUI : MonoBehaviour
     private void Awake()
     {
         gameObject.SetActive(false);
-        Debug.Log("SUB");
-        GameplayController.onGameEnd += EnableGameStats; //TODO move to some UIController and get rid of setactive false
+
+        EventBus.Subscribe<OnGameEndEvent>(EnableGameStats); //TODO move to some UIController and get rid of setactive false
     }
 
-    private void EnableGameStats()
+    private void EnableGameStats(OnGameEndEvent evt)
     {
         gameObject.SetActive(true);
     }
@@ -49,6 +50,6 @@ public class EndGameStatsUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameplayController.onGameEnd -= EnableGameStats;
+        EventBus.Unsubscribe<OnGameEndEvent>(EnableGameStats);
     }
 }

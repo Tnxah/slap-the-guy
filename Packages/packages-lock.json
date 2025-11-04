@@ -1,5 +1,21 @@
 {
   "dependencies": {
+    "com.rockinmyshoe.eventbus": {
+      "version": "https://github.com/Tnxah/EventBus.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "e45f9581a3b4d8d63c5eeb58311cca0b0f59a955"
+    },
+    "com.rockinmyshoe.statusstorage": {
+      "version": "https://github.com/Tnxah/StatusStorage.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.rockinmyshoe.eventbus": "1.0.0"
+      },
+      "hash": "210e963d6463c88770d0b6d79c738b691573d890"
+    },
     "com.unity.2d.animation": {
       "version": "12.0.2",
       "depth": 1,
@@ -239,10 +255,10 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.0.2",
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.modules.unityanalytics": "1.0.0",
         "com.unity.services.core": "1.12.5",
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.modules.unityanalytics": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
         "com.unity.services.authentication": "2.7.4"
       },
       "url": "https://packages.unity.com"

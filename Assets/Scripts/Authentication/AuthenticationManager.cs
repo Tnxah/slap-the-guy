@@ -6,15 +6,16 @@ using PlayFab;
 
 public class AuthenticationManager : MonoBehaviour
 {
+#if PLATFORM_ANDROID && !UNITY_EDITOR
     private void Awake()
     {
-#if PLATFORM_ANDROID && !UNITY_EDITOR
+
         PlayGamesPlatform.Activate();
         AuthenticateWithGooglePlay();
-#endif
-    }
 
-    private void AuthenticateWithGooglePlay()
+}
+
+private void AuthenticateWithGooglePlay()
     {
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
     }
@@ -59,5 +60,5 @@ public class AuthenticationManager : MonoBehaviour
     {
         Debug.Log("PF Login Failure LoginWithGooglePlayGamesServices: " + error.GenerateErrorReport());
     }
-
+#endif
 }

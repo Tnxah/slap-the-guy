@@ -1,27 +1,24 @@
 using Photon.Pun;
+using RockInMyShoe.Global.DataStorage;
+using RockInMyShoe.Global.Eventing;
 using System;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameplayController : MonoBehaviourPunCallbacks
 {
     public static event Action onGameStart;
-    public static event Action onGameEnd;
     public bool isStarted { private set; get; }
 
     private static int playerCount;
 
-    private void FixedUpdate()
+    private void Awake()
     {
-        if (playerCount <= 1)
-        {
-            EndGame();
-        }
+        EventBus.Subscribe<OnPlayerDieEvent>(CheckEndGame);
     }
 
     public static void PlayerDies()
     {
         playerCount--;
+        EventBus.Publish(new OnPlayerDieEvent { });
     }
 
     public void StartGame()
@@ -31,16 +28,25 @@ public class GameplayController : MonoBehaviourPunCallbacks
             onGameStart?.Invoke();
         }
 
+        StatusStorage.SetStatus(BattleStatus.Lose);
         playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
     }
 
-    private void EndGame()
+    private void CheckEndGame(OnPlayerDieEvent evt)
     {
-        if (isStarted)
+        print($"CheckEndGame {isStarted} {playerCount}");
+        if (isStarted && playerCount <= 1)
         {
             //isStarted = false;
-            onGameEnd?.Invoke();
+            print(StatusStorage.GetStatus<BattleStatus>());
+            EventBus.Publish(new OnGameEndEvent());
         }
     }
 
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<OnPlayerDieEvent>(CheckEndGame);
+    }
 }
+
+public class OnGameEndEvent { }

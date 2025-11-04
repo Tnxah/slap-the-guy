@@ -1,4 +1,5 @@
 using Photon.Pun;
+using RockInMyShoe.Global.Eventing;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviourPunCallbacks
@@ -18,7 +19,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             playerControls = new PlayerControls();
             GameplayController.onGameStart += OnGameStart;
-            GameplayController.onGameEnd += OnGameEnd;
+            EventBus.Subscribe<OnGameEndEvent>(OnGameEnd);
             pointer.SetActive(true);
         }
 
@@ -34,7 +35,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if(photonView.IsMine)
             EnableAttack();
     }
-    private void OnGameEnd()
+    private void OnGameEnd(OnGameEndEvent evt)
     {
         if(photonView.IsMine)
             DisableAttack();
@@ -97,7 +98,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             GameplayController.onGameStart -= OnGameStart;
-            GameplayController.onGameEnd -= OnGameEnd;
+            EventBus.Unsubscribe<OnGameEndEvent>(OnGameEnd);
         }
     }
 }
