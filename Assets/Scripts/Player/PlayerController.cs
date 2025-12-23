@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public PlayerCombat playerCombat;
     public PlayerMovement playerMovement;
     public PlayerControls playerControls { get; private set; }
+    public PlayerSoundController playerSoundController;
 
     [SerializeField]
     private GameObject pointer;
@@ -27,6 +28,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         playerStats = gameObject.GetComponent<PlayerStats>();
         playerCombat = gameObject.GetComponent<PlayerCombat>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
+        playerSoundController = gameObject.GetComponent<PlayerSoundController>();
 
     }
 

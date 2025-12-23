@@ -1,21 +1,31 @@
 using Photon.Pun;
 using RockInMyShoe.Global.DataStorage;
 using RockInMyShoe.Global.Eventing;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
 {
     private PlayerControls playerControls;
 
+    private bool isBacking = false;
+
     private void Awake()
     {
         playerControls = new PlayerControls();
-        playerControls.Player.Back.performed += _ => Back();
+        playerControls.Player.Back.performed += _ => StartCoroutine(Back());
     }
 
-    private void Back()
+    private IEnumerator Back()
     {
-        if (PhotonNetwork.IsConnectedAndReady)
+        if (isBacking) yield return null;
+
+        isBacking = true;
+
+        yield return new WaitUntil(() => (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Disconnected || PhotonNetwork.IsConnectedAndReady));
+
+        if (PhotonNetwork.IsConnectedAndReady || PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Disconnected)
         {
             PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
             PhotonNetwork.LeaveRoom();

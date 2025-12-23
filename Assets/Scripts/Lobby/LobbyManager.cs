@@ -23,7 +23,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();
+        if (!PhotonNetwork.ConnectUsingSettings()) {
+            PhotonNetwork.Reconnect();
+        }
 
         int gameMode = PlayerPrefs.GetInt("GameMode");
         if (gameMode == 1)
@@ -69,8 +71,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         if (!string.IsNullOrEmpty(roomNameInput.text))
         {
-            SceneManager.LoadScene("Battleground");
-            PhotonNetwork.JoinOrCreateRoom(roomNameInput.text, new RoomOptions { MaxPlayers = maxPlayers }, TypedLobby.Default);
+            if(PhotonNetwork.JoinOrCreateRoom(roomNameInput.text, new RoomOptions { MaxPlayers = maxPlayers }, TypedLobby.Default))
+                SceneManager.LoadScene("Battleground");
         }
     }
 
