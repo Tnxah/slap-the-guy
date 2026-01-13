@@ -113,4 +113,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions { MaxPlayers = maxPlayers };
         PhotonNetwork.CreateRoom("Matchmaking_" + playerRating, roomOptions);
     }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        PhotonNetwork.Reconnect();
+    }
+
+    private void FixedUpdate()
+    {
+        if(!PhotonNetwork.IsConnectedAndReady && PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Disconnected)
+        {
+            PhotonNetwork.Reconnect();
+        }
+    }
 }

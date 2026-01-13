@@ -17,18 +17,32 @@ public class BattlegroundSceneEscape : MonoBehaviourPunCallbacks
         playerControls.Player.Back.performed += _ => StartCoroutine(Back());
     }
 
+    public void ButtonBack()
+    {
+        StartCoroutine(Back());
+    }
+
     private IEnumerator Back()
     {
         if (isBacking) yield return null;
 
         isBacking = true;
 
+        if (PhotonNetwork.IsConnectedAndReady)
+        {
+            PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.Disconnect();
+        }
+        else
+        {
+            PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+        }
+
         yield return new WaitUntil(() => (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Disconnected || PhotonNetwork.IsConnectedAndReady));
 
         if (PhotonNetwork.IsConnectedAndReady || PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Disconnected)
         {
-            PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
-            PhotonNetwork.LeaveRoom();
             var status = StatusStorage.GetStatus<BattleStatus>();
             EventBus.Publish(new BackToLobbyEvent { status =  status});
             print("BackToLobbyEvent" + status);

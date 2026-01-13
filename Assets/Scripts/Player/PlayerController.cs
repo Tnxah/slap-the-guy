@@ -1,6 +1,8 @@
 using Photon.Pun;
+using Photon.Realtime;
 using RockInMyShoe.Global.Eventing;
 using UnityEngine;
+using static VotingManager;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
@@ -14,14 +16,28 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject pointer;
 
+    public SimpleBotAI botAI;
+
     private void Awake()
     {
+        if (!(photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            botAI.enabled = false;
+        }
+
         if (photonView.IsMine)
         {
             playerControls = new PlayerControls();
             GameplayController.onGameStart += OnGameStart;
             EventBus.Subscribe<OnGameEndEvent>(OnGameEnd);
-            pointer.SetActive(true);
+            if(!(photonView.IsRoomView && photonView.CompareTag("Player")))
+                pointer.SetActive(true);
+        }
+
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            EventBus.Publish<OnCharacterCreatedEvent>(new OnCharacterCreatedEvent());
+            GameplayController.onGameStart += botAI.OnGameStart;
         }
 
         animationController = gameObject.GetComponent<AnimationController>();
@@ -29,7 +45,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
         playerCombat = gameObject.GetComponent<PlayerCombat>();
         playerMovement = gameObject.GetComponent<PlayerMovement>();
         playerSoundController = gameObject.GetComponent<PlayerSoundController>();
-
     }
 
     private void OnGameStart()
@@ -101,6 +116,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             GameplayController.onGameStart -= OnGameStart;
             EventBus.Unsubscribe<OnGameEndEvent>(OnGameEnd);
+        }
+    }
+
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")) && GameplayController.PlayersWithBotsCount() > 4)
+        {
+            PhotonNetwork.Destroy(photonView);
+            EventBus.Publish<OnCharacterCreatedEvent>(new OnCharacterCreatedEvent());
         }
     }
 }

@@ -8,8 +8,8 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
     private PlayerController controller;
     private PlayerControls playerControls;
 
-    private const int DodgeCost = 10;
-    private const float DodgeStaminaBurn = 8f;
+    private const int DodgeCost = 8;
+    private const float DodgeStaminaBurn = 7f;
 
     private PlayerStats playerStats;
 
@@ -23,7 +23,17 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
     {
         controller = GetComponent<PlayerController>();
 
-        if (photonView.IsMine)
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+#if PLATFORM_ANDROID
+            controller.botAI.DodgeStart += () => StartCoroutine(TouchscreenDodgeStart());
+#else 
+            controller.botAI.DodgeStart += DodgeStart;
+#endif
+            controller.botAI.DodgeEnd += DodgeEnd;
+        }
+
+        else if (photonView.IsMine)
         {
             playerControls = controller.playerControls;
 
@@ -52,6 +62,13 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
 
     private IEnumerator TouchscreenDodgeStart()
     {
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            DodgeStart();
+            yield break;
+        }
+
+
         var startPos = playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y;
 
         yield return new WaitForSeconds(0.1f);
@@ -69,7 +86,7 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
     {
         playerStats.StopStaminaBurn();
 
-        if (photonView.IsMine && dodging)
+        if (photonView.IsMine && !(photonView.IsRoomView && photonView.CompareTag("Player")) && dodging)
         {
             RoundStats.DodgedSeconds(Time.time - dodgeStartTime);
         }
@@ -97,7 +114,13 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
 
     public override void OnDisable()
     {
-        if (photonView.IsMine)
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            controller.botAI.DodgeStart -= DodgeStart;
+            controller.botAI.DodgeEnd -= DodgeEnd;
+        }
+
+        else if (photonView.IsMine)
         {
             playerControls.Player.Dodge.performed -= ctx => DodgeStart();
             playerControls.Player.Dodge.canceled -= ctx => DodgeEnd();

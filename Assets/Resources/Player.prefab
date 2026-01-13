@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 1877188844436306574}
   - component: {fileID: 1537665055118457635}
   - component: {fileID: 1442955535453011046}
+  - component: {fileID: 196625704279257957}
   - component: {fileID: 3166276282058257937}
   - component: {fileID: 4656217390123184367}
   - component: {fileID: 4039566435157649228}
@@ -201,6 +202,7 @@ MonoBehaviour:
   playerMovement: {fileID: 0}
   playerSoundController: {fileID: 0}
   pointer: {fileID: 5838903972691998141}
+  botAI: {fileID: 196625704279257957}
 --- !u!114 &3062372908488081466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,6 +287,31 @@ MonoBehaviour:
   punchSounds:
   - {fileID: 8300000, guid: c3750d7de28befa4c84c60095e661620, type: 3}
   audioSource: {fileID: 4719822742648237100}
+--- !u!114 &196625704279257957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2496525944427091977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91dc838be947917449a22812171f5411, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleBotAI
+  decisionInterval: 0.25
+  eyePoint: {fileID: 5403682467289177545}
+  adjacentX: 1
+  maxSenseRange: 10
+  standingHurtboxMask:
+    serializedVersion: 2
+    m_Bits: 256
+  rerollDirectionChance: 0.2
+  punchChanceIfAdjacent: 0.45
+  throwChanceIfFar: 0.6
+  crouchChanceIfDanger: 0.2
+  crouchTapDurationRange: {x: 0.2, y: 2.2}
+  incomingProjectile: 0
 --- !u!95 &3166276282058257937
 Animator:
   serializedVersion: 7

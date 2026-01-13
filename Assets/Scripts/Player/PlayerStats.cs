@@ -45,17 +45,21 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
 
         if (photonView.IsMine)
         {
-            statsBar.SetHealth(health);
-            RoundStats.DamageReceived(amount);
+            if (!(photonView.IsRoomView && photonView.CompareTag("Player"))) { 
+                statsBar.SetHealth(health);
+                RoundStats.DamageReceived(amount);
+            }
         }
-        if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks damage for damage owner (but not damage from self)
+        if(damageOwner != null)
+        if ((damageOwner.IsMine && (!(damageOwner.IsRoomView && damageOwner.CompareTag("Player")))) && (!photonView.IsMine || (photonView.IsRoomView && photonView.CompareTag("Player")))) //Victim tracks damage for damage owner (but not damage from self)
         {
             RoundStats.DamageDealt(amount);
         }
 
         if (health <= 0)
         {
-            if (damageOwner.IsMine && !photonView.IsMine) //Victim tracks death for killer (but not suicide)
+            if (damageOwner != null)
+            if ((damageOwner.IsMine && (!(damageOwner.IsRoomView && damageOwner.CompareTag("Player")))) && (!photonView.IsMine || (photonView.IsRoomView && photonView.CompareTag("Player")))) //Victim tracks death for killer (but not suicide) (damageOwner.IsMine && !photonView.IsMine)
             {
                 RoundStats.PlayerKnocked();
             }
@@ -70,7 +74,8 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
         if (photonView.IsMine)
         {
             PhotonNetwork.Destroy(gameObject);
-            StatusStorage.SetStatus(BattleStatus.Lose);
+            if(!photonView.IsRoomView)
+                StatusStorage.SetStatus(BattleStatus.Lose);
         }
         print("PunRPC_Die");
         GameplayController.PlayerDies();
@@ -83,7 +88,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
         {
             stamina = Mathf.Clamp(stamina - amount, 0, 100);
 
-            if (photonView.IsMine)
+            if (photonView.IsMine && !(photonView.IsRoomView && photonView.CompareTag("Player")))
                 statsBar.SetStamina(stamina);
             
             return true;
@@ -100,12 +105,12 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
             if (regenerateStamina)
             {
                 stamina = Mathf.Clamp(stamina + staminaHeal, 0, 100);
-                if (photonView.IsMine)
+                if (photonView.IsMine && !(photonView.IsRoomView && photonView.CompareTag("Player")))
                     statsBar.SetStamina(stamina);
             }
 
             health = Mathf.Clamp(health + healthHeal, 0, 100);
-            if (photonView.IsMine)
+            if (photonView.IsMine && !(photonView.IsRoomView && photonView.CompareTag("Player")))
                 statsBar.SetHealth(health);
         }
     }
@@ -131,7 +136,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
             yield return new WaitForSeconds(CourutineTimeStep);
 
             stamina = Mathf.Clamp(stamina - amount, 0, 100);
-            if (photonView.IsMine)
+            if (photonView.IsMine && !(photonView.IsRoomView && photonView.CompareTag("Player")))
                 statsBar.SetStamina(stamina);
 
             if (stamina <= 0)
@@ -144,8 +149,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IDamageable
     }
 
     private void CheckWin(OnGameEndEvent evt)
-    {   
-        if(photonView.IsMine)
+    {
+        if (!photonView.IsMine || photonView.IsRoomView)
+            return;
 
         if(health > 0f)
             StatusStorage.SetStatus(BattleStatus.Win);

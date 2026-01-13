@@ -1,3 +1,4 @@
+using RockInMyShoe.Global.DataStorage;
 using RockInMyShoe.Global.Eventing;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +7,9 @@ using UnityEngine;
 
 public class EndGameStatsUI : MonoBehaviour
 {
+    [SerializeField]
+    private TextMeshProUGUI gameOverText;
+
     [SerializeField]
     private TextMeshProUGUI playersKnocked;
     [SerializeField]
@@ -24,11 +28,17 @@ public class EndGameStatsUI : MonoBehaviour
         gameObject.SetActive(false);
 
         EventBus.Subscribe<OnGameEndEvent>(EnableGameStats); //TODO move to some UIController and get rid of setactive false
+        EventBus.Subscribe<BattleStatus>(SetBattleStatusText);
     }
 
     private void EnableGameStats(OnGameEndEvent evt)
     {
         gameObject.SetActive(true);
+    }
+
+    private void SetBattleStatusText(BattleStatus status)
+    {
+        gameOverText.text = status == BattleStatus.Win ? "YOU WIN!" : "Game Over";
     }
 
     private void RefreshStats()

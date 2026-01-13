@@ -18,7 +18,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     {
         controller = GetComponent<PlayerController>();
 
-        if (photonView.IsMine)
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            controller.botAI.Rotate += BotRotate;
+        } 
+        else if (photonView.IsMine)
         {
             playerControls = controller.playerControls;
 
@@ -31,6 +35,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public int GetDirection()
     {
         return direction;
+    }
+
+    private void BotRotate(int rawValue)
+    {
+        int value = (int)Mathf.Sign(rawValue);
+
+        print("Rotate");
+        photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
     }
 
     private void Rotate(InputAction.CallbackContext ctx)
@@ -46,7 +58,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         }
         int value = (int)Mathf.Sign(rawValue);
 
-        print("Rotate");
+        print("Rotate " + "Pos " + transform.position);
         photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
     }
 
@@ -78,7 +90,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     public override void OnDisable()
     {
-        if (photonView.IsMine)
+        if((photonView.IsRoomView && photonView.CompareTag("Player")))
+            controller.botAI.Rotate -= BotRotate;
+        else if (photonView.IsMine)
             playerControls.Player.Rotate.performed -= ctx => Rotate(ctx);
+        
     }
 }

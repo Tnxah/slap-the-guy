@@ -13,7 +13,7 @@ public class DamagePoint : MonoBehaviour
             if (collider.gameObject.TryGetComponent(out IDamageable target))
             {
                 target.TakeDamage(damage, PhotonView.Get(transform.parent));
-                if (PhotonView.Get(transform.parent).IsMine)
+                if (PhotonView.Get(transform.parent).IsMine && !(PhotonView.Get(transform.parent).IsRoomView && transform.parent.CompareTag("Player")))
                 {
                     RoundStats.Hited();
                 }

@@ -30,7 +30,13 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
     {
         controller = GetComponent<PlayerController>();
 
-        if (photonView.IsMine)
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            controller.botAI.Attack += Attack;
+
+            controller.botAI.Throw += Throw;
+        }
+        else if (photonView.IsMine)
         {
             playerControls = controller.playerControls;
 
@@ -43,8 +49,9 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
     private void Attack()
     {
 #if PLATFORM_ANDROID
-        if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y > Screen.height / 2)
-            return;
+        if (!(photonView.IsRoomView && photonView.CompareTag("Player")))
+            if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y > Screen.height / 2)
+                return;
 #endif
 
         if (controller.playerStats.TryUseStamina(AttackCost))
@@ -63,8 +70,9 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
     private void Throw()
     {
 #if PLATFORM_ANDROID
-        if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y < Screen.height / 2)
-            return;
+        if(!(photonView.IsRoomView && photonView.CompareTag("Player")))
+            if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y < Screen.height / 2)
+                return;
 #endif
 
         if (controller.playerStats.TryUseStamina(ThrowCost))
@@ -93,7 +101,7 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
         throwableItem.AddForce(new Vector2(direction * throwableSpeed, 0), ForceMode2D.Force);
 
-        if (photonView.IsMine)
+        if (photonView.IsMine && !(photonView.IsRoomView && photonView.CompareTag("Player")))
         {
             RoundStats.ItemThrown();
         }
@@ -101,7 +109,13 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
     public override void OnDisable()
     {
-        if (photonView.IsMine)
+        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
+        {
+            controller.botAI.Attack -= Attack;
+            controller.botAI.Throw -= Throw;
+        }
+
+        else if (photonView.IsMine)
         {
             playerControls.Player.Attack.performed -= _ => Attack();
             playerControls.Player.Throw.performed -= _ => Throw();

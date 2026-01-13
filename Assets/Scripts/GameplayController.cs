@@ -2,6 +2,7 @@ using Photon.Pun;
 using RockInMyShoe.Global.DataStorage;
 using RockInMyShoe.Global.Eventing;
 using System;
+using UnityEngine;
 
 public class GameplayController : MonoBehaviourPunCallbacks
 {
@@ -29,7 +30,7 @@ public class GameplayController : MonoBehaviourPunCallbacks
         }
 
         StatusStorage.SetStatus(BattleStatus.Lose);
-        playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        playerCount = PlayersWithBotsCount();
     }
 
     private void CheckEndGame(OnPlayerDieEvent evt)
@@ -46,6 +47,32 @@ public class GameplayController : MonoBehaviourPunCallbacks
     private void OnDestroy()
     {
         EventBus.Unsubscribe<OnPlayerDieEvent>(CheckEndGame);
+    }
+
+    public static int PlayersWithBotsCount()
+    {
+        var count = PhotonNetwork.CurrentRoom.PlayerCount;
+
+        count += GetBotsAmount();
+
+        return count;
+    }
+
+    public static int GetBotsAmount()
+    {
+        int count = 0;
+
+        var views = FindObjectsByType<PhotonView>(FindObjectsSortMode.None);
+        foreach (var view in views)
+        {
+            if (view.IsRoomView && view.CompareTag("Player"))
+            {
+                print(view.gameObject.name);
+                count++;
+            }
+        }
+
+        return count;
     }
 }
 

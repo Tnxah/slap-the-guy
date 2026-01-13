@@ -1,9 +1,11 @@
 using Photon.Pun;
 using Photon.Realtime;
 using RockInMyShoe.Global.DataStorage;
+using RockInMyShoe.Global.Eventing;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static VotingManager;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
@@ -18,6 +20,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         gameplayController = GetComponent<GameplayController>();
         GameplayController.onGameStart += CloseRoom;
+        EventBus.Subscribe<OnAllVoted>(CloseRoom);
     }
 
     private void CreatePlayer()
@@ -34,8 +37,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         Debug.Log("Player left: " + otherPlayer.NickName);
-        OnPlayerEnteredOrLeft();
+        
+        PhotonNetwork.DestroyPlayerObjects(otherPlayer);
+
         GameplayController.PlayerDies();
+        OnPlayerEnteredOrLeft();
     }
 
     [PunRPC]
@@ -47,26 +53,62 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         playerSpawnPoints.Clear();
 
+        print($"SORTED PLAYERS AMOUNT {sortedPlayers.Count}");
+
         for (int i = 0; i < sortedPlayers.Count; i++)
         {
             if (i < spawnPoints.Count)
             {
+                print($"mesto igroka = {i} igrok = {sortedPlayers[i].ActorNumber}");
                 playerSpawnPoints[sortedPlayers[i]] = spawnPoints[i];
                 MovePlayerToSpawnPoint(sortedPlayers[i], spawnPoints[i]);
             }
         }
+
+        PhotonView[] photonViews = FindObjectsByType<PhotonView>(FindObjectsSortMode.InstanceID);
+        var currentBotnumber = 0;
+        foreach (PhotonView view in photonViews)
+        {
+            if (view.IsRoomView && view.CompareTag("Player"))
+            {
+                print($"Player COUNT = {PhotonNetwork.PlayerList.Count()} current bot number = {currentBotnumber}; mesto bota = {PhotonNetwork.PlayerList.Count() + currentBotnumber}");
+                view.transform.position = spawnPoints[PhotonNetwork.PlayerList.Count() + currentBotnumber].position;
+                currentBotnumber++;
+            }
+        }
+
+        //======================================
+
+        //PhotonView[] photonViews = FindObjectsByType<PhotonView>(FindObjectsSortMode.InstanceID);
+        //var players = 0;
+        //print($"photonViewsCount: {photonViews.Length}");
+        //foreach (PhotonView view in photonViews)
+        //{
+        //    print($"{view.name} / {view.InstantiationId}");
+        //    if (view.CompareTag("Player"))
+        //    {
+        //        print($"PLAYER!!!! {view.name} / {view.InstantiationId} place: {spawnPoints[players].position} playernumber {players}");
+        //        //print($"Player COUNT = {PhotonNetwork.PlayerList.Count()} current bot number = {currentBotnumber}; mesto bota = {PhotonNetwork.PlayerList.Count() + currentBotnumber}");
+        //        view.transform.position = spawnPoints[players].position;
+        //        players++;
+        //    }
+        //}
+
+        //======================================
     }
 
     private void MovePlayerToSpawnPoint(Player player, Transform spawnPoint)
     {
-        PhotonView[] photonViews = FindObjectsOfType<PhotonView>();
+        PhotonView[] photonViews = FindObjectsByType<PhotonView>(FindObjectsSortMode.InstanceID);
         foreach (PhotonView view in photonViews)
         {
-            if (view.Owner == player)
+            if (view.Owner == player && view.CompareTag("Player") && !view.IsRoomView)
             {
+                print(view.Owner.ActorNumber + " oaoaoao " + player.ActorNumber + " --- " + spawnPoint.name);
                 view.transform.position = spawnPoint.position;
-                
-                break;
+
+                print("player pos is now = " + view.transform.position);
+                return;
             }
         }
     }
@@ -75,7 +117,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom && !gameplayController.isStarted)
         {
-            if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+            if (GameplayController.PlayersWithBotsCount() >= PhotonNetwork.CurrentRoom.MaxPlayers)
             {
                 CloseRoom();
             }
@@ -101,6 +143,17 @@ public class RoomManager : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.IsVisible = false;
         }
     }
+
+    private void CloseRoom(OnAllVoted evt)
+    {
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
+        {
+            Debug.Log("Room Closed");
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+        }
+    }
+
     private  void OpenRoom()
     {
         if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
@@ -113,9 +166,24 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            for (int i = 0; i < 1; i++)
+            {
+                PhotonNetwork.InstantiateRoomObject("Player", Vector3.zero, Quaternion.identity);
+            }
+        }
+            
+
         CreatePlayer();
         OnPlayerEnteredOrLeft();
 
         StatusStorage.SetStatus(BattleStatus.None);
+    }
+
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<OnAllVoted>(CloseRoom);
     }
 }
