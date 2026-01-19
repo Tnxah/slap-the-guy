@@ -57,7 +57,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 Destroy(rooms[roomInfo.Name]);
                 rooms.Remove(roomInfo.Name);
             }
-            else if(!rooms.ContainsKey(roomInfo.Name))
+            else if(!rooms.ContainsKey(roomInfo.Name) /*&& rooms.Count < 50*/)
             {
                 GameObject roomListItem = Instantiate(roomListItemPrefab, roomListContent.transform);
                 roomListItem.GetComponentInChildren<TextMeshProUGUI>().text = roomInfo.Name;
@@ -69,7 +69,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void CreateRoom()
     {
-        if (!string.IsNullOrEmpty(roomNameInput.text))
+        if (!string.IsNullOrEmpty(roomNameInput.text) && PhotonNetwork.InLobby)
         {
             if(PhotonNetwork.JoinOrCreateRoom(roomNameInput.text, new RoomOptions { MaxPlayers = maxPlayers }, TypedLobby.Default))
                 SceneManager.LoadScene("Battleground");

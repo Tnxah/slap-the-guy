@@ -26,10 +26,10 @@ public class RemoteConfigManager : MonoBehaviour
     {
         // initialize Unity's authentication and core services, however check for internet connection
         // in order to fail gracefully without throwing exception if connection does not exist
+#if UNITY_ANDROID
         if (Utilities.CheckForInternetConnection())
-        {
+#endif
             await InitializeRemoteConfigAsync();
-        }
 
         RemoteConfigService.Instance.FetchCompleted += ApplyRemoteSettings;
         RemoteConfigService.Instance.FetchConfigs(new userAttributes(), new appAttributes());
@@ -37,8 +37,6 @@ public class RemoteConfigManager : MonoBehaviour
 
     void ApplyRemoteSettings(ConfigResponse configResponse)
     {
-        Debug.Log("RemoteConfigService.Instance.appConfig fetched: " + RemoteConfigService.Instance.appConfig.config.ToString());
-
         EventBus.Publish(new OnRemoteConfigValuesFetched { configOrigin = configResponse.requestOrigin, appConfig = RemoteConfigService.Instance.appConfig });
     }
 }

@@ -25,27 +25,31 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
 
         if ((photonView.IsRoomView && photonView.CompareTag("Player")))
         {
-#if PLATFORM_ANDROID
-            controller.botAI.DodgeStart += () => StartCoroutine(TouchscreenDodgeStart());
-#else 
             controller.botAI.DodgeStart += DodgeStart;
-#endif
             controller.botAI.DodgeEnd += DodgeEnd;
         }
-
         else if (photonView.IsMine)
         {
             playerControls = controller.playerControls;
 
-#if PLATFORM_ANDROID
-            playerControls.Player.Dodge.performed += ctx => StartCoroutine(TouchscreenDodgeStart());
-#else 
-            playerControls.Player.Dodge.performed += ctx => DodgeStart();
-#endif
+            playerControls.Player.Dodge.performed += ctx => DodgeStart(ctx);
             playerControls.Player.Dodge.canceled += ctx => DodgeEnd();
         }
 
         playerStats = controller.playerStats;
+    }
+
+    private void DodgeStart(InputAction.CallbackContext ctx)
+    {
+        if (ctx.control?.device is Touchscreen ts)
+        {
+            StartCoroutine(TouchscreenDodgeStart(ts));
+            return;
+        }
+        else
+        {
+            DodgeStart();
+        }
     }
 
     private void DodgeStart()
@@ -60,20 +64,12 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator TouchscreenDodgeStart()
-    {
-        if ((photonView.IsRoomView && photonView.CompareTag("Player")))
-        {
-            DodgeStart();
-            yield break;
-        }
-
-
-        var startPos = playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y;
+    private IEnumerator TouchscreenDodgeStart(Touchscreen ts)
+    {   var startPos = ts.primaryTouch.position.ReadValue().y;
 
         yield return new WaitForSeconds(0.1f);
 
-        var direction = startPos - playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y;
+        var direction = startPos - ts.primaryTouch.position.ReadValue().y;
 
         if (direction > 20 && playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2) 
         {
@@ -122,7 +118,7 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
 
         else if (photonView.IsMine)
         {
-            playerControls.Player.Dodge.performed -= ctx => DodgeStart();
+            playerControls.Player.Dodge.performed -= ctx => DodgeStart(ctx);
             playerControls.Player.Dodge.canceled -= ctx => DodgeEnd();
         }
     }

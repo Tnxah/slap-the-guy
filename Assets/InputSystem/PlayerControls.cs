@@ -123,7 +123,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Fake"",
                     ""type"": ""Button"",
                     ""id"": ""f469d4b9-32de-43be-87f7-030f5dac9763"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -398,8 +398,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""93e5dcb8-e89a-488f-9f7f-3df9f4a9bf7d"",
-                    ""path"": ""<Touchscreen>/position"",
+                    ""id"": ""e9cfe5db-f969-4ba3-962b-e15a5f5c79c1"",
+                    ""path"": ""<Pointer>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

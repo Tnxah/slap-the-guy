@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Random = System.Random;
 
 
@@ -40,20 +41,25 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
         {
             playerControls = controller.playerControls;
 
-            playerControls.Player.Attack.performed += _ => Attack();
+            playerControls.Player.Attack.performed += ctx => Attack(ctx);
 
-            playerControls.Player.Throw.performed += _ => Throw();
+            playerControls.Player.Throw.performed += ctx => Throw(ctx);
         }
+    }
+
+    private void Attack(InputAction.CallbackContext ctx)
+    {
+        if(ctx.control?.device is Touchscreen ts)
+        {
+            if (ts.primaryTouch.position.ReadValue().x < Screen.width / 2 || ts.primaryTouch.position.ReadValue().y > Screen.height / 2) 
+                return;
+        }
+
+        Attack();
     }
 
     private void Attack()
     {
-#if PLATFORM_ANDROID
-        if (!(photonView.IsRoomView && photonView.CompareTag("Player")))
-            if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y > Screen.height / 2)
-                return;
-#endif
-
         if (controller.playerStats.TryUseStamina(AttackCost))
         {
             print("Attack");
@@ -67,14 +73,19 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
         controller.animationController.AttackAnimation();
     }
 
+    private void Throw(InputAction.CallbackContext ctx)
+    {
+        if (ctx.control?.device is Touchscreen ts)
+        {
+            if (ts.primaryTouch.position.ReadValue().x < Screen.width / 2 || ts.primaryTouch.position.ReadValue().y < Screen.height / 2)
+                return;
+        }
+
+        Throw();
+    }
+
     private void Throw()
     {
-#if PLATFORM_ANDROID
-        if(!(photonView.IsRoomView && photonView.CompareTag("Player")))
-            if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x < Screen.width / 2 || playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().y < Screen.height / 2)
-                return;
-#endif
-
         if (controller.playerStats.TryUseStamina(ThrowCost))
         {
             var randomId = availableThrowables[random.Next(0, availableThrowables.Count)];
@@ -117,8 +128,8 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
 
         else if (photonView.IsMine)
         {
-            playerControls.Player.Attack.performed -= _ => Attack();
-            playerControls.Player.Throw.performed -= _ => Throw();
+            playerControls.Player.Attack.performed -= ctx => Attack(ctx);
+            playerControls.Player.Throw.performed -= ctx => Throw(ctx);
         }
     }
 }

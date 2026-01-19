@@ -1,12 +1,14 @@
+#if UNITY_ANDROID && !UNITY_EDITOR
 using GooglePlayGames.BasicApi;
 using GooglePlayGames;
+#endif
 using UnityEngine;
 using PlayFab.ClientModels;
 using PlayFab;
 
 public class AuthenticationManager : MonoBehaviour
 {
-#if PLATFORM_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
     private void Awake()
     {
 

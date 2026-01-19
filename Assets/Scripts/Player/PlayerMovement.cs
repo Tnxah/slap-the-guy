@@ -1,13 +1,14 @@
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 {
     private PlayerController controller;
     private PlayerControls playerControls;
 
-#if PLATFORM_ANDROID
+#if UNITY_ANDROID
     private const float InputDeadZone = 200f;
 #else
     private const float InputDeadZone = 0.2f;
@@ -20,7 +21,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
         if ((photonView.IsRoomView && photonView.CompareTag("Player")))
         {
-            controller.botAI.Rotate += BotRotate;
+            controller.botAI.Rotate += Rotate;
         } 
         else if (photonView.IsMine)
         {
@@ -37,28 +38,26 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         return direction;
     }
 
-    private void BotRotate(int rawValue)
-    {
-        int value = (int)Mathf.Sign(rawValue);
-
-        print("Rotate");
-        photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
-    }
-
     private void Rotate(InputAction.CallbackContext ctx)
     {
-#if PLATFORM_ANDROID
-        if (playerControls.TouchscreenHelper.Position.ReadValue<Vector2>().x > Screen.width/ 2)
-            return;
-#endif
+        if (ctx.control?.device is Touchscreen ts)
+        {
+            if (ts.primaryTouch.position.ReadValue().x > Screen.width / 2)
+                return;
+        }
 
         var rawValue = ctx.ReadValue<float>();
-        if (rawValue < InputDeadZone && rawValue > -InputDeadZone) { //handle dead zone
+        if (rawValue < InputDeadZone && rawValue > -InputDeadZone)
+        { //handle dead zone
             return;
         }
-        int value = (int)Mathf.Sign(rawValue);
 
-        print("Rotate " + "Pos " + transform.position);
+        Rotate((int)rawValue);
+    }
+
+    private void Rotate(int rawValue)
+    {
+        int value = (int)Mathf.Sign(rawValue);
         photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
     }
 
@@ -91,7 +90,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public override void OnDisable()
     {
         if((photonView.IsRoomView && photonView.CompareTag("Player")))
-            controller.botAI.Rotate -= BotRotate;
+            controller.botAI.Rotate -= Rotate;
         else if (photonView.IsMine)
             playerControls.Player.Rotate.performed -= ctx => Rotate(ctx);
         
