@@ -14,6 +14,11 @@ public class AnimationController : MonoBehaviour
         animator.SetTrigger("Attack");
     }
 
+    public void FartAnimation()
+    {
+        animator.SetBool("Fart", true);
+    }
+
     public void DodgeAnimation()
     {
         animator.SetBool("Dodge", true);

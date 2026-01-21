@@ -52,12 +52,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
             return;
         }
 
-        Rotate((int)rawValue);
+        Rotate((int)Mathf.Sign(rawValue));
     }
 
-    private void Rotate(int rawValue)
+    private void Rotate(int value)
     {
-        int value = (int)Mathf.Sign(rawValue);
         photonView.RPC("PunRPC_Rotate", RpcTarget.All, value);
     }
 

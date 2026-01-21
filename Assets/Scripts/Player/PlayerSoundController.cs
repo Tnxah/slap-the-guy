@@ -12,6 +12,9 @@ public class PlayerSoundController : MonoBehaviour
     private List<AudioClip> punchSounds;
 
     [SerializeField]
+    private List<AudioClip> fartSounds;
+
+    [SerializeField]
     private AudioSource audioSource;
 
     private Random rnd = new Random();
@@ -25,6 +28,12 @@ public class PlayerSoundController : MonoBehaviour
     public void PlayPunchSound() 
     {
         audioSource.clip = punchSounds[rnd.Next(punchSounds.Count)];
+        audioSource.Play();
+    }
+
+    public void PlayFartSound()
+    {
+        audioSource.clip = fartSounds[rnd.Next(fartSounds.Count)];
         audioSource.Play();
     }
 }
