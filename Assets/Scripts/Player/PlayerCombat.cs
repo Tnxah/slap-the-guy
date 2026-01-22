@@ -96,7 +96,7 @@ public class PlayerCombat : MonoBehaviourPunCallbacks
     [PunRPC]
     private void PunRPC_Throw(int prefabId)
     {
-        nextThrowable = prefabId;
+        nextThrowable = prefabId < throwablePrefabs.Count? prefabId : 0; //For scenario when because of the different versions there are less or more throwables on one client
         controller.animationController.ThrowAnimation();
     }
 
