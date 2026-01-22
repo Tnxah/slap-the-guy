@@ -1,19 +1,17 @@
 using RockInMyShoe.Global.Eventing;
-using Unity.Services.LevelPlay;
-using Unity.Services.RemoteConfig;
+using System;
 using UnityEngine;
 
 public class AdsManager : MonoBehaviour
 {
     public static AdsManager Instanse;
-
-    private InterstitialAdManager InterstitialAd { get; set; }
-    private LevelPlayRewardedAd RewardedAd { get; set; }
     private int _adsCooldown = 3;
 
-    //----------------
+    private IAdsProvider _provider;
 
     private static int currentCount;
+
+    private bool _initialized;
 
     private void Awake()
     {
@@ -25,97 +23,69 @@ public class AdsManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        _provider = new LevelPlayAdsProvider("23ff76ccd", "4n2nznmhl8jyr3f6", "ag5z1prg1ezctjf4");
     }
 
-    public void Start()
+    private async void Start()
     {
-        LevelPlay.OnInitSuccess += SdkInitializationCompletedEvent;
-        LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
+        var result = await _provider.InitializeAsync();
 
-        // SDK init
-        LevelPlay.Init("23ff76ccd");
+        if (result.Success)
+            OnInitSuccess();
+        else
+            OnInitFailed(result.Error);
+
     }
-
-    private void InitializeRewardedAd()
-    {
-        if (RewardedAd == null)
-        {
-            RewardedAd = new LevelPlayRewardedAd("4n2nznmhl8jyr3f6");
-            PrepareRewarded();
-        }
-
-        RewardedAd.LoadAd();
-    }
-
-    private void SdkInitializationFailedEvent(LevelPlayInitError error) { }
-
-    private void SdkInitializationCompletedEvent(LevelPlayConfiguration configuration)
-    {
-        //LevelPlay.LaunchTestSuite();
-        InitializeRewardedAd();
-        InterstitialAd = new();
-
-        EventBus.Subscribe<BackToLobbyEvent>(ShowAdOnCountdown);
-    }
-
 
     private void ShowAdOnCountdown(BackToLobbyEvent evt)
     {
-        print($"{currentCount} / {_adsCooldown} - {evt.status}");
-
         if (evt.status != BattleStatus.Lose)
             return;
 
         currentCount++;
 
-        
         if (currentCount >= _adsCooldown)
         {
-            InterstitialAd.ShowAd();
-
+            _provider.TryShowInterstitial();
             currentCount = 0;
         }
     }
 
-    private void PrepareRewarded()
+    private void ShowInterstitial()
     {
-        // Register to Rewarded events
-        RewardedAd.OnAdLoaded += RewardedOnAdLoadedEvent;
-        RewardedAd.OnAdLoadFailed += RewardedOnAdLoadFailedEvent;
-        RewardedAd.OnAdDisplayed += RewardedOnAdDisplayedEvent;
-        RewardedAd.OnAdDisplayFailed += RewardedOnAdDisplayFailedEvent;
-        RewardedAd.OnAdRewarded += RewardedOnAdRewardedEvent;
-        RewardedAd.OnAdClosed += RewardedOnAdClosedEvent;
-        // Optional 
-        RewardedAd.OnAdClicked += RewardedOnAdClickedEvent;
-        RewardedAd.OnAdInfoChanged += RewardedOnAdInfoChangedEvent;
-
-        // Implement the events
-        void RewardedOnAdLoadedEvent(LevelPlayAdInfo adInfo) { }
-        void RewardedOnAdLoadFailedEvent(LevelPlayAdError error) { RewardedAd.LoadAd();  }
-        void RewardedOnAdDisplayedEvent(LevelPlayAdInfo adInfo) { RewardedAd.LoadAd(); }
-        void RewardedOnAdDisplayFailedEvent(LevelPlayAdInfo adInfo, LevelPlayAdError error) { RewardedAd.LoadAd(); }
-        void RewardedOnAdRewardedEvent(LevelPlayAdInfo adInfo, LevelPlayReward adReward) { RewardedAd.LoadAd(); }
-        void RewardedOnAdClosedEvent(LevelPlayAdInfo adInfo) { RewardedAd.LoadAd(); }
-        void RewardedOnAdClickedEvent(LevelPlayAdInfo adInfo) { }
-        void RewardedOnAdInfoChangedEvent(LevelPlayAdInfo adInfo) { }
+        _provider.TryShowInterstitial();
     }
 
-    public void ShowRewarded()
+    private void ShowRewarded(Action onRewarded = null)
     {
-        if (!RewardedAd.IsAdReady())
-        {
-            RewardedAd.LoadAd();
-        }
+        _provider.TryShowRewarded(onRewarded);
+    }
 
-        if (RewardedAd.IsAdReady())
-        {
-            RewardedAd.ShowAd();
-        }
+    private void OnInitSuccess()
+    {
+        EventBus.Subscribe<BackToLobbyEvent>(ShowAdOnCountdown);
+        _initialized = true;
+    }
+
+    private void OnInitFailed(string error)
+    {
+        Debug.LogError($"Init failed: {error}");
     }
 
     private void RetrieveAdsCooldown(OnRemoteConfigValuesFetched evt)
     {
         _adsCooldown = evt.appConfig.GetInt("AdsCooldown", _adsCooldown);
+    }
+
+    private void OnEnable()
+    {
+        if(!_initialized)
+            EventBus.Subscribe<BackToLobbyEvent>(ShowAdOnCountdown);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<BackToLobbyEvent>(ShowAdOnCountdown);
     }
 }
