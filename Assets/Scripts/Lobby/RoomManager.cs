@@ -5,6 +5,7 @@ using RockInMyShoe.Global.Eventing;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static VotingManager;
 
 public class RoomManager : MonoBehaviourPunCallbacks
@@ -180,6 +181,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
         OnPlayerEnteredOrLeft();
 
         StatusStorage.SetStatus(BattleStatus.None);
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+            Debug.Log("Something went wrong. Create your own room");
+        //PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayers });
+        PhotonNetwork.JoinOrCreateRoom("Test", new RoomOptions { MaxPlayers = 5 }, TypedLobby.Default);
+                
     }
 
     private void OnDestroy()

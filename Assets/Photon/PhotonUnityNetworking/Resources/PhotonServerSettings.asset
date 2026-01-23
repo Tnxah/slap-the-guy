@@ -54,6 +54,7 @@ MonoBehaviour:
   - StartGame
   - PunRPC_Die
   - RPCUpdateRequiredVotes
+  - SetNicknameRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -82,24 +82,16 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinRoom(roomName);
     }
 
-    //public void JoinRandomRoom()
-    //{
-    //    PhotonNetwork.JoinRandomRoom();
-    //}
-
-    //public override void OnJoinRandomFailed(short returnCode, string message)
-    //{
-    //    int gameMode = PlayerPrefs.GetInt("GameMode");
-    //    if (gameMode == 1)
-    //    {
-    //        CreateMatchmakingRoom();
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("Something went wrong. Create your own room");
-    //        //PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayers });
-    //    }
-    //}
+    public void JoinRandomRoom()
+    {
+        if (PhotonNetwork.InLobby)
+        {
+            if (PhotonNetwork.JoinRandomRoom())
+            {
+                SceneManager.LoadScene("Battleground");
+            }
+        }
+    }
 
     public void StartMatchmaking()
     {

@@ -93,9 +93,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
-            playerControls.Player.Disable();
+            playerControls?.Player.Disable();
 #if PLATFORM_ANDROID
-            playerControls.TouchscreenHelper.Disable();
+            playerControls?.TouchscreenHelper.Disable();
 #endif
         }
     }

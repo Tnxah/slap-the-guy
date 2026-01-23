@@ -15,6 +15,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 #endif
     private int direction;
 
+    [SerializeField]
+    private GameObject nickname; //TODO: THIS IS TEMPORARY, GET RID OF IT
+
     private void Awake()
     {
         controller = GetComponent<PlayerController>();
@@ -84,6 +87,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     private void SetScale(int direction)
     {
         gameObject.transform.localScale = new Vector3(direction, 1, 1);
+        nickname.transform.localScale = new Vector3(direction, 1, 1); //TODO: THIS IS TEMPORARY, GET RID OF IT (This is to not mirror the nickname while turning player)
     }
 
     public override void OnDisable()
