@@ -4,12 +4,25 @@ public class AuthenticationManager : MonoBehaviour
 {
     private IAuthenticator authenticator;
 
+    public static AuthenticationManager instance;
+
     private void Awake()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+        if (instance)
+        {
+            return;
+        }
+        else
+        {
+            instance = this;
+        }
+
+#if UNITY_EDITOR
+        authenticator = new DummyAuthenticator();
+#elif UNITY_ANDROID
         authenticator = new GooglePlayGamesAuthenticator(true);
 #else
-
+        authenticator = new DummyAuthenticator();
 #endif
     }
 

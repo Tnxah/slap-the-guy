@@ -1,5 +1,7 @@
+#if UNITY_ANDROID
 using GooglePlayGames.BasicApi;
 using GooglePlayGames;
+#endif
 using PlayFab.ClientModels;
 using PlayFab;
 using System.Threading.Tasks;
@@ -7,8 +9,12 @@ using UnityEngine;
 using System;
 using System.Threading;
 
-public class GooglePlayGamesAuthenticator : IAuthenticator
+public class GooglePlayGamesAuthenticator 
+    #if UNITY_ANDROID 
+    : IAuthenticator 
+    #endif
 {
+#if UNITY_ANDROID
     private Task<bool> _authTask;
     private TaskCompletionSource<bool> _tcs;
 
@@ -46,9 +52,10 @@ public class GooglePlayGamesAuthenticator : IAuthenticator
 
     internal void ProcessAuthentication(SignInStatus status)
     {
-        if (loginToPlayfab && status == SignInStatus.Success)
+        if (status == SignInStatus.Success)
         {
-            PlayGamesPlatform.Instance.RequestServerSideAccess(false, ProcessServerAuthCode);
+            if(loginToPlayfab)
+                PlayGamesPlatform.Instance.RequestServerSideAccess(false, ProcessServerAuthCode);
         }
         else
         {
@@ -88,4 +95,5 @@ public class GooglePlayGamesAuthenticator : IAuthenticator
         _tcs = null;
         _authTask = null;
     }
+#endif
 }

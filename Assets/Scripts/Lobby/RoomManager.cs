@@ -4,8 +4,8 @@ using RockInMyShoe.Global.DataStorage;
 using RockInMyShoe.Global.Eventing;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using static VotingManager;
 
 public class RoomManager : MonoBehaviourPunCallbacks
@@ -16,6 +16,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     [SerializeField]
     private List<Transform> spawnPoints;
+
+    [SerializeField]
+    private TextMeshProUGUI roomNameGraffiti;
 
     private void Awake()
     {
@@ -168,6 +171,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinedRoom();
 
+        roomNameGraffiti.text = PhotonNetwork.CurrentRoom.Name;
+
         if (PhotonNetwork.IsMasterClient)
         {
             for (int i = 0; i < 1; i++)
@@ -187,7 +192,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
             Debug.Log("Something went wrong. Create your own room");
         //PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayers });
-        PhotonNetwork.JoinOrCreateRoom("Test", new RoomOptions { MaxPlayers = 5 }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom(AuthenticationManager.instance.GetUserName(), new RoomOptions { MaxPlayers = 5 }, TypedLobby.Default);
                 
     }
 
