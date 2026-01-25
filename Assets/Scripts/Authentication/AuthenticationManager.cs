@@ -1,66 +1,31 @@
-#if UNITY_ANDROID && !UNITY_EDITOR
-using GooglePlayGames.BasicApi;
-using GooglePlayGames;
-#endif
 using UnityEngine;
-using PlayFab.ClientModels;
-using PlayFab;
 
 public class AuthenticationManager : MonoBehaviour
 {
-#if UNITY_ANDROID && !UNITY_EDITOR
+    private IAuthenticator authenticator;
+
     private void Awake()
     {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        authenticator = new GooglePlayGamesAuthenticator(true);
+#else
 
-        PlayGamesPlatform.Activate();
-        AuthenticateWithGooglePlay();
-
-}
-
-private void AuthenticateWithGooglePlay()
-    {
-        PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+#endif
     }
 
-    internal void ProcessAuthentication(SignInStatus status)
+    private async void Start()
     {
-        if (status == SignInStatus.Success)
+        var authRes = await authenticator.Authenticate();
+
+        if (authRes)
         {
-            print($"Name: {PlayGamesPlatform.Instance.GetUserDisplayName()}");
-            PlayGamesPlatform.Instance.RequestServerSideAccess(false, ProcessServerAuthCode);
+            print($"Authenticated as {authenticator.GetUserName()}");
         }
         else
         {
-            PlayGamesPlatform.Instance.ManuallyAuthenticate(ProcessAuthentication);
-
-            // Disable your integration with Play Games Services or show a login button
-            // to ask users to sign-in. Clicking it should call
-            // PlayGamesPlatform.Instance.ManuallyAuthenticate(ProcessAuthentication).
+            print($"Authentication failed");
         }
     }
 
-    private void ProcessServerAuthCode(string serverAuthCode)
-    {
-        Debug.Log("Server Auth Code: " + serverAuthCode);
-
-        var request = new LoginWithGooglePlayGamesServicesRequest
-        {
-            ServerAuthCode = serverAuthCode,
-            CreateAccount = true,
-            TitleId = PlayFabSettings.TitleId
-        };
-
-        PlayFabClientAPI.LoginWithGooglePlayGamesServices(request, OnLoginWithGooglePlayGamesServicesSuccess, OnLoginWithGooglePlayGamesServicesFailure);
-    }
-
-    private void OnLoginWithGooglePlayGamesServicesSuccess(LoginResult result)
-    {
-        Debug.Log("PF Login Success LoginWithGooglePlayGamesServices");
-    }
-
-    private void OnLoginWithGooglePlayGamesServicesFailure(PlayFabError error)
-    {
-        Debug.Log("PF Login Failure LoginWithGooglePlayGamesServices: " + error.GenerateErrorReport());
-    }
-#endif
+    public string GetUserName() => authenticator.GetUserName();
 }
