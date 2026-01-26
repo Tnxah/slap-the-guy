@@ -12,10 +12,12 @@ public class TutorialStartup : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL
         if (!tutorialShown)
         {
             OpenTutorial();
+        } else {
+            alwaysOnScreenHints.SetActive(true);
         }
 #else
         if (PlayerPrefs.GetInt("FIRSTTIMEOPENING", 1) == 1)
@@ -39,7 +41,7 @@ public class TutorialStartup : MonoBehaviour
 
     public void OnCloseTutorial()
     {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL
         tutorialShown = true;
 #else
         PlayerPrefs.SetInt("FIRSTTIMEOPENING", 0);

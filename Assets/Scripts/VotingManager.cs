@@ -127,8 +127,8 @@ public class VotingManager : MonoBehaviourPunCallbacks
     private IEnumerator AutoVote()
     {
         for (int i = autoVoteTime; i >= 0; i--) {
-            autoVoteText.text = $"READY ({i})";
             yield return new WaitUntil(() => !tutorialPanel.activeSelf);
+            autoVoteText.text = $"READY ({i})";
             yield return new WaitForSeconds(1);
         }
 
