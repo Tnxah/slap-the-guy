@@ -3,7 +3,6 @@ using Photon.Realtime;
 using RockInMyShoe.Global.Eventing;
 using TMPro;
 using UnityEngine;
-using static VotingManager;
 
 public class NicknameManager : MonoBehaviourPunCallbacks
 {

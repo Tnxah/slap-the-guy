@@ -103,7 +103,7 @@ public class PlayerDefense : MonoBehaviourPunCallbacks
             animationController.DodgeAnimation();
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-            if(Random.Range(0f,3f) < 1)
+            if(Random.Range(0f,5f) < 1)
                 animationController.FartAnimation();
 #endif
         }

@@ -83,16 +83,12 @@ public class SimpleBotAI : MonoBehaviour
             // Sense standing target in facing direction
             var hit = Physics2D.Raycast(startRaycastPosition, Vector2.right * facing, maxSenseRange, standingHurtboxMask);
             bool hasTarget = hit.collider != null;
-            print($"Has target {hasTarget}");
 
             float dist = hasTarget ? hit.distance : float.PositiveInfinity;
-            print($"Distance to target {dist} {hit.distance}");
 
             bool adjacent = hasTarget && dist <= adjacentX;
 
             bool far = hasTarget && dist > adjacentX;
-
-            print($"adjasent {adjacent}. far {far}");
 
             // Danger logic (simple)
             bool danger = incomingProjectile || adjacent;

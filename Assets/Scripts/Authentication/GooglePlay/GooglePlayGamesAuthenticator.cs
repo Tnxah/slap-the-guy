@@ -25,7 +25,7 @@ public class GooglePlayGamesAuthenticator
         this.loginToPlayfab = loginToPlayfab;
     }
 
-    public string GetUserName() => PlayGamesPlatform.Instance.IsAuthenticated() ? PlayGamesPlatform.Instance.GetUserDisplayName() : null;
+    public string GetUserName() => PlayGamesPlatform.Instance.IsAuthenticated() ? PlayGamesPlatform.Instance.GetUserDisplayName() : RandomNameGenerator.GetName();
 
     public Task<bool> Authenticate(CancellationToken ct = default)
     {

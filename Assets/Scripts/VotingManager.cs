@@ -12,6 +12,7 @@ public class VotingManager : MonoBehaviourPunCallbacks
     private int votes = 0;
     private int minVotes = 3;
     private int requiredVotes;
+    private int autoVoteTime = 8;
 
     private bool botVoted = false;
 
@@ -21,6 +22,10 @@ public class VotingManager : MonoBehaviourPunCallbacks
     private TextMeshProUGUI votesText;
     [SerializeField]
     private TextMeshProUGUI readyText;
+    [SerializeField]
+    private TextMeshProUGUI autoVoteText;
+
+    private Coroutine autoVoteRoutine;
 
     private GameplayController gameplayController;
 
@@ -36,10 +41,13 @@ public class VotingManager : MonoBehaviourPunCallbacks
     public void OnVoteButton()
     {
         voteButton.gameObject.SetActive(false);
+        StopCoroutine(autoVoteRoutine);
+        autoVoteRoutine = null;
+
+        autoVoteText.text = "READY";
+
         photonView.RPC("VoteToStart", RpcTarget.All);
 
-        print("BOTS" + GameplayController.GetBotsAmount());
-        print(PhotonNetwork.IsMasterClient + " " + (GameplayController.GetBotsAmount() > 0) + " " + !botVoted);
         if (PhotonNetwork.IsMasterClient && (GameplayController.GetBotsAmount() > 0) && !botVoted)
         {
             for (int i = GameplayController.GetBotsAmount(); i > 0; i--)
@@ -100,7 +108,29 @@ public class VotingManager : MonoBehaviourPunCallbacks
             votes = 0;
             SetVotesText();
             voteButton.gameObject.SetActive(IsEnoughPlayers());
+
+            ResetAutovoting();
         }
+    }
+
+    private void ResetAutovoting()
+    {
+        if(autoVoteRoutine != null)
+            StopCoroutine(autoVoteRoutine);
+
+        autoVoteRoutine = StartCoroutine(AutoVote());
+    }
+
+    private IEnumerator AutoVote()
+    {
+        for (int i = autoVoteTime; i >= 0; i--) {
+            autoVoteText.text = $"READY ({i})";
+            yield return new WaitForSeconds(1);
+        }
+
+        OnVoteButton();
+
+        autoVoteText.text = "READY";
     }
 
     private void SetVotesText()
@@ -152,7 +182,7 @@ public class VotingManager : MonoBehaviourPunCallbacks
         } 
         gameplayController.StartGame();
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
 
         readyText.gameObject.SetActive(false);
     }
