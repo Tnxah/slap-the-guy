@@ -13,10 +13,14 @@ public class ControlsHints : MonoBehaviour
     [SerializeField]
     private Dictionary<InputDevice, Sprite> turnDictionary;
 
+    [SerializeField]
+    private GameObject alwaysOnScreenPc;
+
     public void OnInputDevice(InputDevice device)
     {
         pcHints.SetActive(false);
         mobileHints.SetActive(false);
+        alwaysOnScreenPc.SetActive(false);
 
         switch (device)
         {
@@ -28,7 +32,9 @@ public class ControlsHints : MonoBehaviour
 
             case Mouse:
                 pcHints.SetActive(true);
-
+#if UNITY_WEBGL || UNITY_EDITOR
+                alwaysOnScreenPc.SetActive(true);
+#endif
                 break;
             case Gamepad:
                 pcHints.SetActive(true);

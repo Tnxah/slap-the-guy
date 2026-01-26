@@ -5,6 +5,10 @@ public class TutorialStartup : MonoBehaviour
     [SerializeField]
     private GameObject tutorialPanel, openTutorialButton;
     static bool tutorialShown = false;
+
+    [SerializeField]
+    private GameObject alwaysOnScreenHints;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -36,13 +40,11 @@ public class TutorialStartup : MonoBehaviour
     public void OnCloseTutorial()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
-
         tutorialShown = true;
-
 #else
-
         PlayerPrefs.SetInt("FIRSTTIMEOPENING", 0);
-
 #endif
+
+        alwaysOnScreenHints.SetActive(true);
     }
 }

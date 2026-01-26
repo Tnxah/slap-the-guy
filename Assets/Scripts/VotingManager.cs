@@ -29,6 +29,9 @@ public class VotingManager : MonoBehaviourPunCallbacks
 
     private GameplayController gameplayController;
 
+    [SerializeField]
+    private GameObject tutorialPanel; //TODO: REMOVE IT ITS TEMP SHIT!!!!!
+
     private void Awake()
     {
         gameplayController = GetComponent<GameplayController>();
@@ -125,6 +128,7 @@ public class VotingManager : MonoBehaviourPunCallbacks
     {
         for (int i = autoVoteTime; i >= 0; i--) {
             autoVoteText.text = $"READY ({i})";
+            yield return new WaitUntil(() => !tutorialPanel.activeSelf);
             yield return new WaitForSeconds(1);
         }
 
