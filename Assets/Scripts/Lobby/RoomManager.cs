@@ -2,10 +2,12 @@ using Photon.Pun;
 using Photon.Realtime;
 using RockInMyShoe.Global.DataStorage;
 using RockInMyShoe.Global.Eventing;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static VotingManager;
 
 public class RoomManager : MonoBehaviourPunCallbacks
@@ -20,11 +22,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private TextMeshProUGUI roomNameGraffiti;
 
+    private string lastRoomName;
+    private Coroutine rematchRoutine;
     private void Awake()
     {
         gameplayController = GetComponent<GameplayController>();
         GameplayController.onGameStart += CloseRoom;
         EventBus.Subscribe<OnAllVoted>(CloseRoom);
+        EventBus.Subscribe<OnGameEndEvent>(LeaveRoom);
     }
 
     private void CreatePlayer()
@@ -57,27 +62,26 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         playerSpawnPoints.Clear();
 
-        print($"SORTED PLAYERS AMOUNT {sortedPlayers.Count}");
-
-        for (int i = 0; i < sortedPlayers.Count; i++)
-        {
-            if (i < spawnPoints.Count)
-            {
-                print($"mesto igroka = {i} igrok = {sortedPlayers[i].ActorNumber}");
-                playerSpawnPoints[sortedPlayers[i]] = spawnPoints[i];
-                MovePlayerToSpawnPoint(sortedPlayers[i], spawnPoints[i]);
-            }
-        }
-
         PhotonView[] photonViews = FindObjectsByType<PhotonView>(FindObjectsSortMode.InstanceID);
         var currentBotnumber = 0;
         foreach (PhotonView view in photonViews)
         {
             if (view.IsRoomView && view.CompareTag("Player"))
             {
-                print($"Player COUNT = {PhotonNetwork.PlayerList.Count()} current bot number = {currentBotnumber}; mesto bota = {PhotonNetwork.PlayerList.Count() + currentBotnumber}");
-                view.transform.position = spawnPoints[PhotonNetwork.PlayerList.Count() + currentBotnumber].position;
+                print($"Player COUNT = {PhotonNetwork.PlayerList.Count()} current bot number = {currentBotnumber}; mesto bota = {currentBotnumber}");
+                view.transform.position = spawnPoints[currentBotnumber].position;
                 currentBotnumber++;
+            }
+        }
+
+
+        for (int i = 0; i < sortedPlayers.Count; i++)
+        {
+            if (i < spawnPoints.Count)
+            {
+                print($"mesto igroka = {i} igrok = {sortedPlayers[i].ActorNumber}");
+                playerSpawnPoints[sortedPlayers[i]] = spawnPoints[i + currentBotnumber];
+                MovePlayerToSpawnPoint(sortedPlayers[i], spawnPoints[i + currentBotnumber]);
             }
         }
 
@@ -171,11 +175,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinedRoom();
 
+        lastRoomName = PhotonNetwork.CurrentRoom.Name;
         roomNameGraffiti.text = PhotonNetwork.CurrentRoom.Name;
 
         if (PhotonNetwork.IsMasterClient)
         {
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 2; i++)
             {
                 PhotonNetwork.InstantiateRoomObject("Player", Vector3.zero, Quaternion.identity);
             }
@@ -186,6 +191,41 @@ public class RoomManager : MonoBehaviourPunCallbacks
         OnPlayerEnteredOrLeft();
 
         StatusStorage.SetStatus(BattleStatus.None);
+    }
+
+    public void Replay() //TODO: THIS IS TEMP! REMOVE!!!
+    {
+        if (rematchRoutine != null) return;
+
+        rematchRoutine = StartCoroutine(ReplayRoutine());
+    }
+
+    private IEnumerator ReplayRoutine()
+    {
+        if(PhotonNetwork.InRoom)
+            PhotonNetwork.LeaveRoom();
+
+        yield return new WaitUntil(() =>
+        PhotonNetwork.IsConnected &&
+        PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer
+    );
+
+        if (!string.IsNullOrEmpty(lastRoomName))
+        {
+            if (PhotonNetwork.JoinOrCreateRoom(lastRoomName, new RoomOptions { MaxPlayers = 5 }, TypedLobby.Default))
+                SceneManager.LoadScene("Battleground");
+        }
+        else
+        {
+            SceneManager.LoadScene("Lobby");
+        }
+
+        rematchRoutine = null;
+    }
+
+    private void LeaveRoom(OnGameEndEvent evt)
+    {
+        PhotonNetwork.LeaveRoom();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -199,5 +239,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
     private void OnDestroy()
     {
         EventBus.Unsubscribe<OnAllVoted>(CloseRoom);
+        EventBus.Unsubscribe<OnGameEndEvent>(LeaveRoom);
     }
 }

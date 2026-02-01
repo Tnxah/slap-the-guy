@@ -44,4 +44,16 @@ public static class RandomNameGenerator
         name = $"{adjective}{noun}{number}";
         return name;
     }
+
+    public static string SingleTimeUseNickname()
+    {
+        var rnd = new Random();
+
+        string adjective = Adjectives[rnd.Next(Adjectives.Length)];
+        string noun = Nouns[rnd.Next(Nouns.Length)];
+
+        int number = rnd.Next(1, 100); // 1–99
+
+        return $"{adjective}{noun}{number}";
+    }
 }

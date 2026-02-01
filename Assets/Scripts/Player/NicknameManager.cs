@@ -8,6 +8,8 @@ public class NicknameManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] private TextMeshProUGUI nickname;
 
+    private string nicknameName;
+
     private void Awake()
     {
         if (photonView.IsMine && !photonView.IsRoomView)
@@ -15,8 +17,9 @@ public class NicknameManager : MonoBehaviourPunCallbacks
 
         else if (PhotonNetwork.IsMasterClient && photonView.IsRoomView && photonView.CompareTag("Player"))
         {
-            photonView.RPC("SetNicknameRPC", RpcTarget.Others, "Bot Melman");
-            SetNicknameRPC("Bot Melman");
+            nicknameName = RandomNameGenerator.SingleTimeUseNickname();
+            photonView.RPC("SetNicknameRPC", RpcTarget.Others, nicknameName);
+            SetNicknameRPC(nicknameName);
         }
 
         //EventBus.Subscribe<OnAllVoted>(_ => HideNickname());
@@ -28,8 +31,8 @@ public class NicknameManager : MonoBehaviourPunCallbacks
             photonView.RPC("SetNicknameRPC", RpcTarget.All, AuthenticationManager.instance.GetUserName());
         else if (PhotonNetwork.IsMasterClient && photonView.IsRoomView && photonView.CompareTag("Player"))
         {
-            photonView.RPC("SetNicknameRPC", RpcTarget.Others, "Bot Melman");
-            SetNicknameRPC("Bot Melman");
+            photonView.RPC("SetNicknameRPC", RpcTarget.Others, nicknameName);
+            SetNicknameRPC(nicknameName);
         }
     }
 
